@@ -1,0 +1,23 @@
+# Java build files
+target/
+*.class
+
+# Maven wrapper
+.mvn/
+!/.mvn/wrapper/maven-wrapper.jar
+
+# IDE settings
+.idea/
+.vscode/
+*.iml
+
+# System files
+.DS_Store
+
+# Logs and temp
+*.log
+logs/
+*.tmp
+
+# Environment files
+.env
