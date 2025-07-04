@@ -1,4 +1,4 @@
-package com.jarodpaulson.mvsimulator.mv_simulator;
+package com.mvsim;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,4 +1,4 @@
-package com.jarodpaulson.mvsimulator.mv_simulator;
+package com.mvsim;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
