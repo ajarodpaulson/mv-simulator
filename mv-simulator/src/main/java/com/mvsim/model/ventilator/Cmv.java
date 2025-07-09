@@ -1,5 +1,7 @@
 package com.mvsim.model.ventilator;
 
+import com.mvsim.model.ventilator.settings.Trigger;
+
 /**
  * Represents an algorithm for breath sequence behaviour in the strategy
  * pattern.

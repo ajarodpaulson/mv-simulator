@@ -1,9 +1,11 @@
-package com.mvsim.model.patient;
+package com.mvsim.model.lungsim;
 
 /**
  * Represents a lung simulator that can be connected to a ventilator.
  */
-
+/*
+ * TODO: any utility in adding the builder pattern here?
+ */
 public class LungSim {
     private float compliance;
     private float resistance;
@@ -11,6 +13,14 @@ public class LungSim {
     private float currentVolume;
     private float currentPressure;
 
+    public LungSim(float compliance, float resistance) {
+        this.compliance = compliance;
+        this.resistance = resistance;
+        this.currentVolume = 0.0f;
+        this.currentPressure = 0.0f;
+        this.breathingPattern = null;
+    }
+    
     public BreathingPattern getBreathingPattern() {
         return breathingPattern;
     }

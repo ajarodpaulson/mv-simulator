@@ -1,32 +1,29 @@
 package com.mvsim.model.ventilator;
 
+import com.mvsim.model.ventilator.settings.Settings;
+
 /**
- * TODO: improve the design of this class as more ventilation modes are added...
- * use Chatburn's taxonomy?
- * Represents a ventilation mode
+ * Represents a ventilation mode that is composed by combining breath sequence,
+ * targeting scheme, and control variable behaviour.
+ * The ventilation mode is also responsible for orchestrating these three
+ * behavioural components during each tick once ventilation has started.
  */
 public abstract class VentilationMode<V extends ModeControlVariable> {
-    Ventilator vtr;
+    protected Ventilator vtr;
 
-    BreathSequence seq;
-    TargetingScheme<V> ts;
-    ControlVariable<V> cv;
+    protected BreathSequence seq;
+    protected TargetingScheme<V> ts;
+    protected ControlVariable<V> cv;
 
-    // InitCycleBehaviour initCycleBehaviour;
-    // InhaleBehaviour inhaleBehaviour;
-    // ExhaleBehaviour exhaleBehaviour;
-    // EndCycleBehaviour endCycleBehaviour;
-    // XXX: protected abstract void setup(); // necessary?
+    protected Settings settings;
 
-    // TODO: enabledAlarms() // a list of alarms that should be enabled for this
-    // mode
-
-    VentilationMode(Ventilator vtr, BreathSequence breathSequence, TargetingScheme<V> targetingScheme,
-            ControlVariable<V> controlVariable) {
+    VentilationMode(Ventilator vtr, ControlVariable<V> controlVariable, BreathSequence breathSequence,
+            TargetingScheme<V> targetingScheme, Settings settings) {
         this.vtr = vtr;
         this.seq = breathSequence;
         this.ts = targetingScheme;
         this.cv = controlVariable;
+        this.settings = settings;
     }
 
     public void tick() {
@@ -34,4 +31,21 @@ public abstract class VentilationMode<V extends ModeControlVariable> {
         ts.updateTarget(vtr);
         cv.actuate(vtr);
     }
+
+    public Settings getSettings() {
+        return settings;
+    }
+
+    public void setSettings(Settings settings) {
+        this.settings = settings;
+    }
 }
+
+// InitCycleBehaviour initCycleBehaviour;
+// InhaleBehaviour inhaleBehaviour;
+// ExhaleBehaviour exhaleBehaviour;
+// EndCycleBehaviour endCycleBehaviour;
+// XXX: protected abstract void setup(); // necessary?
+
+// TODO: enabledAlarms() // a list of alarms that should be enabled for this
+// mode
