@@ -1,11 +1,11 @@
-package com.mvsim.model.ventilator;
+package com.mvsim.model.ventilator.mode;
 
-public class ModeType {
+public class ModeTAG {
     ControlVariableType controlVariableType;
     BreathSequenceType breathSequenceType;
     TargetingSchemeType targetingSchemeType;
 
-    public ModeType(ControlVariableType cv, BreathSequenceType seq, TargetingSchemeType targ) {
+    public ModeTAG(ControlVariableType cv, BreathSequenceType seq, TargetingSchemeType targ) {
         this.controlVariableType = cv;
         this.breathSequenceType = seq;
         this.targetingSchemeType = targ;   
@@ -33,7 +33,7 @@ public class ModeType {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        ModeType other = (ModeType) obj;
+        ModeTAG other = (ModeTAG) obj;
         if (controlVariableType != other.controlVariableType)
             return false;
         if (breathSequenceType != other.breathSequenceType)

@@ -9,6 +9,7 @@ public enum MenuCommands {
     CREATE_NEW_LUNG_SIM("Create a new lung simulator", "n"),
     SELECT_VENT_MODE_AND_SETTINGS("Select a ventilation mode and settings", "m"),
     START_VENTILATION("Start ventilation", "b"),
+    CHANGE_VENTILATION("Change ventilation settings",  "c"),
     STOP_VENTILATION("Stop ventilation", "e"),
     QUIT_APPLICATION("Exit the application", "q");
     

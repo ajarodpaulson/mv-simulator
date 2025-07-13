@@ -1,4 +1,4 @@
-package com.mvsim.model.ventilator;
+package com.mvsim.model.ventilator.mode;
 
 import com.mvsim.model.ventilator.settings.InspiratoryTime;
 import com.mvsim.model.ventilator.settings.RespiratoryRate;

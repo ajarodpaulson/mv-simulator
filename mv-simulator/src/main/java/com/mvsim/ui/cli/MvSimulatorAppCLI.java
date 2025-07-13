@@ -3,12 +3,12 @@ package com.mvsim.ui.cli;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
 import com.mvsim.model.SimulationManager;
 import com.mvsim.model.Units;
+import com.mvsim.model.exception.ActiveModeNotSetException;
 import com.mvsim.model.exception.PreconditionViolatedException;
 import com.mvsim.model.lungsim.LungSim;
-import com.mvsim.model.ventilator.ModeType;
+import com.mvsim.model.ventilator.mode.ModeTAG;
 import com.mvsim.model.ventilator.settings.Setting;
 import com.mvsim.ui.cli.exception.MenuCommandNotFoundException;
 
@@ -74,6 +74,9 @@ public class MvSimulatorAppCLI {
             case START_VENTILATION:
                 startVentilation();
                 break;
+            case CHANGE_VENTILATION:
+                changeVentilation();
+                break;
             case STOP_VENTILATION:
                 stopVentilation();
                 break;
@@ -87,14 +90,78 @@ public class MvSimulatorAppCLI {
         printDivider();
     }
 
+    private void changeVentilation() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'changeVentilation'");
+    }
+
     private void stopVentilation() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'stopVentilation'");
     }
 
+    /**
+     * Starts the ventilator using the active mode and settings and prints out the
+     * peak pressure, delivered flow rate, and delivered tidal volume, respectively,
+     * on three different lines. The user may change or stop ventilation at any
+     * time.
+     */
+    /*
+     * jobs:
+     * call start ventilation on the ventilator
+     * while the ventilator is ventilating
+     * whenever a control loop tick finishes, obtain the pressure, flowrate, and
+     * tidal volume data and print it
+     * Whenever inspiration finishes and expiration, update the peak pressure and
+     * inspired tidal volume
+     * Whenever expiration finishes and inspiration starts, update the expired tidal
+     * volume and measured Peep
+     * Every 60s update respiratory rate and minute volume (TODO: use more accurate
+     * calculation like rolling avg or calculating time between breaths)
+     */
+
     private void startVentilation() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'startVentilation'");
+        try {
+            simMgr.startSimulation();
+        } catch (ActiveModeNotSetException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        Thread displayThread = new Thread(() -> {
+            System.out.println("\n\n\n");
+
+            while (simMgr.isVentilating()) {
+                String pressureData = String.format("%.2f", simMgr.getCurrentSystemPressure());
+                String flowData = String.format("%.2f", simMgr.getCurrentSystemFlowrate());
+                String volumeData = String.format("%.2f", simMgr.getCurrentSystemVolumeChange());
+
+                synchronized (System.out) {
+                    System.out.print("\033[3A");
+                    System.out.printf("Pressure: %-50s\n", pressureData);
+                    System.out.printf("Flow:     %-50s\n", flowData);
+                    System.out.printf("Volume:   %-50s\n", volumeData);
+                }
+
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
+
+        // You will need an input thread here to stop the simulation
+        // For now, we just start the display thread
+        displayThread.start();
+
+        try {
+            displayThread.join();
+            System.out.println("\nVentilation stopped.");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.out.println("Ventilation was interrupted.");
+        }
     }
 
     /**
@@ -129,9 +196,12 @@ public class MvSimulatorAppCLI {
      * trigger, where you want to be able to choose between a flow and a pressure
      * trigger? What about settings that are a boolean (e.g., sigh breaths on,
      * volume guarantee on)?
+     * 
+     * TODO: enforce that all settings set before proceeding i.e., allowing
+     * ventilation to be enabled
      */
     private void chooseSettings() {
-        for (Setting setting : simMgr.getVtr().getActiveMode().getSettings()) {
+        for (Setting setting : simMgr.getVtrController().getActiveMode().getSettings()) {
             System.out.println("Enter the desired setting for the " + setting.getName() + ".");
             setting.setValue(this.scanner.nextFloat());
             this.scanner.nextLine();
@@ -158,11 +228,11 @@ public class MvSimulatorAppCLI {
     private void chooseMode() {
         System.out.println("Available ventilation modes:");
 
-        List<ModeType> availableModes = new ArrayList<>(simMgr.getVtr().getAvailableModes());
+        List<ModeTAG> availableModes = new ArrayList<>(simMgr.getVtrController().getAvailableModes());
 
         for (int i = 0; i < availableModes.size(); i++) {
-            ModeType mode = availableModes.get(i);
-            System.out.println((i + 1) + ": " + mode.toString());
+            ModeTAG m = availableModes.get(i);
+            System.out.println((i + 1) + ": " + m.toString());
         }
 
         System.out.println("\nEnter mode number:");
@@ -170,9 +240,9 @@ public class MvSimulatorAppCLI {
         scanner.nextLine();
 
         if (selection > 0 && selection <= availableModes.size()) {
-            ModeType selectedMode = availableModes.get(selection - 1);
-            simMgr.getVtr().setActiveMode(simMgr.getVtr().getModeTable().getMode(selectedMode));
-            System.out.println("Selected mode: " + selectedMode);
+            ModeTAG selectedModeTAG = availableModes.get(selection - 1);
+            simMgr.getVtrController().setActiveMode(selectedModeTAG);
+            System.out.println("Selected mode: " + selectedModeTAG);
         } else {
             System.out.println("Invalid selection. Please try again.");
         }

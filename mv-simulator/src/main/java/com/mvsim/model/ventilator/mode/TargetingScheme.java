@@ -1,4 +1,4 @@
-package com.mvsim.model.ventilator;
+package com.mvsim.model.ventilator.mode;
 
 /**
  * Represents targeting scheme behaviour for a ventilation mode in the Strategy
@@ -6,5 +6,5 @@ package com.mvsim.model.ventilator;
  * the current control-loop tick.
  */
 public interface TargetingScheme<V extends ModeControlVariable> {
-    public void updateTarget(Ventilator vtr);
+    public void updateTarget();
 }

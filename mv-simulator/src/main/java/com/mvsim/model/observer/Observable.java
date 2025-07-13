@@ -5,12 +5,11 @@ import java.util.List;
 
 /**
  * Represents an observable in the Observer Design Pattern
- * @param <T> The type of observable
  */
-public abstract class Observable<T> {
-    protected List<Observer<T>> observers;
+public abstract class Observable {
+    protected List<Observer> observers;
 
-    public List<Observer<T>> getObservers() {
+    public List<Observer> getObservers() {
         return observers;
     }
 
@@ -26,7 +25,7 @@ public abstract class Observable<T> {
      * 
      * @param o the observer to be added
      */
-    public void addObserver(Observer<T> o) {
+    public void addObserver(Observer o) {
         observers.add(o);
     }
 

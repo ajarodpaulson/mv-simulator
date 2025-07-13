@@ -1,4 +1,4 @@
-package com.mvsim.model.ventilator;
+package com.mvsim.model.ventilator.mode;
 
 /**
  * Represents the control variable behaviour in the Strategy pattern. Implementing
@@ -6,5 +6,5 @@ package com.mvsim.model.ventilator;
  * the ventilator's hardware for the current control-loop tick.
  */
 public interface ControlVariable <V extends ModeControlVariable> {
-    public void actuate(Ventilator vtr);
+    public void actuate();
 }

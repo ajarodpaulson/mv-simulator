@@ -1,12 +1,14 @@
 package com.mvsim.model.observer;
 
+import com.mvsim.model.ventilator.Ventilator;
+
 /**
  * Represents an observer in the Observer Design Pattern
  */
-public interface Observer<T> {
+public interface Observer {
     /**
      * This method should be called within Observable.notifyObservers()
-     * @param observable The object being observed
+     * @param vtr The object being observed
      */
-    void update(T observable);
+    void update(Ventilator vtr);
 }

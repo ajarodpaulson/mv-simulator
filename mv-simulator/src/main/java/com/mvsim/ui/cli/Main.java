@@ -1,6 +1,4 @@
-package com.mvsim.ui;
-
-import com.mvsim.ui.cli.MvSimulatorAppCLI;
+package com.mvsim.ui.cli;
 
 public class Main {
     public static void main(String[] args) {

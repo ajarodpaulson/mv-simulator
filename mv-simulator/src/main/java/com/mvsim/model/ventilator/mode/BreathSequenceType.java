@@ -1,4 +1,4 @@
-package com.mvsim.model.ventilator;
+package com.mvsim.model.ventilator.mode;
 
 public enum BreathSequenceType {
     CONTINUOUS_MANDATORY_VENTILATION("CMV"),  // CMV
