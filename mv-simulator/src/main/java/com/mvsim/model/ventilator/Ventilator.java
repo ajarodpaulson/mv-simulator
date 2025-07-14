@@ -79,7 +79,7 @@ public class Ventilator extends Observable {
         this.addObserver(expFlowSensor);
     }
 
-    public VentilationMode<?> getActiveMode() {
+    protected VentilationMode<?> getActiveMode() {
         return activeMode;
     }
 
@@ -95,8 +95,9 @@ public class Ventilator extends Observable {
     }
 
     /**
-     * Starts ventilation by calling tick on the active mode until something stops
-     * ventilation. If the ventilator is already ventilating, do nothing.
+     * Enables ventilation which allows ventilation to eventually be "started" by
+     * calling VentilationMode.tick(). Checks to ensure that there is an active
+     * mode. If the ventilator is already ventilating, do nothing.
      * 
      * @throws ActiveModeNotSetException
      */
@@ -107,6 +108,7 @@ public class Ventilator extends Observable {
         if (activeMode == null) {
             throw new ActiveModeNotSetException();
         }
+
         isVentilationEnabled.set(true);
     }
 
@@ -139,10 +141,18 @@ public class Ventilator extends Observable {
         return this.pressureSensor;
     }
 
+    /**
+     * Attempts to perform one control loop tick using the active ventilation mode.
+     * @throws IllegalStateException if active mode null or was called while ventilation disabled
+     */
     public void tick() {
-        if (activeMode != null && isVentilationEnabled.get()) {
-            activeMode.tick();
+        if (activeMode == null) {
+            throw new IllegalStateException("Active mode not set.");
+        } 
+        if (!isVentilationEnabled.get()) {
+            throw new IllegalStateException("Ventilation is not enabled.");
         }
+        activeMode.tick();
     }
 
 }

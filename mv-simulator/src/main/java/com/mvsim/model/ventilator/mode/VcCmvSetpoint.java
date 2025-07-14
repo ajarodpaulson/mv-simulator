@@ -12,7 +12,7 @@ public class VcCmvSetpoint extends VentilationMode<VolumeBased> implements Volum
     }
 
     public void setVolumeDeliveredInCurrentInspiratoryPhase() {
-        this.volumeDeliveredInCurrentInspiratoryPhase += vtr.getLatestFlowSensorReading() * (VentilationMode.tickPeriodInMS * 1000);
+        this.volumeDeliveredInCurrentInspiratoryPhase += vtr.getLatestFlowSensorReading() * (VentilationMode.TICK_PERIOD_IN_MS * 1000);
     }
 
     @Override

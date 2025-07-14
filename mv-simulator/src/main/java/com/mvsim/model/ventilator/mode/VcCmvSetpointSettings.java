@@ -19,9 +19,9 @@ public class VcCmvSetpointSettings extends Settings {
 
     private static Map<String, Setting> createModeSpecificSettings() {
         Map<String, Setting> specificSettings = new LinkedHashMap<>();
-        specificSettings.put(RespiratoryRate.NAME, new RespiratoryRate(16));
-        specificSettings.put(TidalVolume.NAME, new TidalVolume(300));
-        specificSettings.put(InspiratoryTime.NAME, new InspiratoryTime(0.9));
+        specificSettings.put(RespiratoryRate.NAME, new RespiratoryRate());
+        specificSettings.put(TidalVolume.NAME, new TidalVolume());
+        specificSettings.put(InspiratoryTime.NAME, new InspiratoryTime());
         return specificSettings;
     }
 }

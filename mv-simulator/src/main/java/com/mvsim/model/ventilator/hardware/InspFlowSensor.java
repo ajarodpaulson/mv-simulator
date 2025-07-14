@@ -21,10 +21,10 @@ public class InspFlowSensor implements Observer {
 
     @Override
     public void update(Ventilator vtr) {
-        if (!vtr.getActiveMode().getIsInInspiratoryPhase()) {
+        if (!vtr.getController().getActiveMode().getIsInInspiratoryPhase()) {
             currentInspiratoryFlow = 0;
         } else {
-            currentInspiratoryFlow = vtr.getActuator().getLastVolumeBolusDelivered() / (VentilationMode.tickPeriodInMS * 1000);
+            currentInspiratoryFlow = vtr.getActuator().getLastVolumeBolusDelivered() / (VentilationMode.TICK_PERIOD_IN_MS / 1000f);
         }
     }
 

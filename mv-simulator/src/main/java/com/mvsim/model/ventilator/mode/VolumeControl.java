@@ -22,7 +22,7 @@ public class VolumeControl implements ControlVariable<VolumeBased> {
      */
     @Override
     public void actuate() {
-        VentilationMode<?> activeMode =  vtr.getActiveMode();
+        VentilationMode<?> activeMode =  vtr.getController().getActiveMode();
         if (!activeMode.getIsInInspiratoryPhase()) {
             vtr.getActuator().regulatePressure((float) activeMode.getSettings().getSetting(Peep.NAME).getValue());
         } else {

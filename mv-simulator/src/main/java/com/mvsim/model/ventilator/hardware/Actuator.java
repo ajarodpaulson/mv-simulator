@@ -11,7 +11,7 @@ import com.mvsim.model.ventilator.Ventilator;
  */
 public class Actuator {
     Ventilator vtr;
-    float lastVolumeBolusDelivered;
+    float lastVolumeBolusDelivered; // XXX
 
     public Actuator(Ventilator vtr) {
         this.vtr = vtr;

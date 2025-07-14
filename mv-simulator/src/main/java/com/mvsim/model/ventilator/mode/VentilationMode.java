@@ -22,15 +22,15 @@ public abstract class VentilationMode<V extends ModeControlVariable> {
      * XXX: feel like these don't belong in this class.
      */
     private int tick;
-    private boolean isInInspiratoryPhase;
-    public static final int tickPeriodInMS = 500;
+    private boolean isInInspiratoryPhase = true;
+    public static final int TICK_PERIOD_IN_MS = 50;
 
     public boolean getIsInInspiratoryPhase() {
         return isInInspiratoryPhase;
     }
 
     public int getTimeInPhaseInMS() {
-        return tick * tickPeriodInMS;
+        return tick * TICK_PERIOD_IN_MS;
     }
 
     public void setIsInInspiratoryPhase(boolean isInInspiratoryPhase) {
@@ -74,8 +74,10 @@ public abstract class VentilationMode<V extends ModeControlVariable> {
     }
 
     public float getTickPeriod() {
-        return tickPeriodInMS;
+        return TICK_PERIOD_IN_MS;
     }
+
+    // protected abstract boolean hasFullyConfiguredSettings(); // not needed for now because all setting strategies will have default values
 }
 
 // InitCycleBehaviour initCycleBehaviour;

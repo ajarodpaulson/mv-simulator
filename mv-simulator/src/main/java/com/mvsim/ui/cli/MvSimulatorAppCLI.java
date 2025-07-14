@@ -241,7 +241,7 @@ public class MvSimulatorAppCLI {
 
         if (selection > 0 && selection <= availableModes.size()) {
             ModeTAG selectedModeTAG = availableModes.get(selection - 1);
-            simMgr.getVtrController().setActiveMode(selectedModeTAG);
+            simMgr.getVtrController().setActiveModeWithCorrespondingDefaultSettings(selectedModeTAG);
             System.out.println("Selected mode: " + selectedModeTAG);
         } else {
             System.out.println("Invalid selection. Please try again.");

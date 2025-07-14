@@ -34,9 +34,9 @@ public class VolumeSetPoint implements TargetingScheme<VolumeBased> {
     public void updateTarget() {
         // XXX
         @SuppressWarnings("unchecked")
-        VentilationMode<VolumeBased> activeMode = (VentilationMode<VolumeBased>) vtr.getActiveMode();
+        VentilationMode<VolumeBased> activeMode = (VentilationMode<VolumeBased>) vtr.getController().getActiveMode();
         Settings settings = activeMode.getSettings();
-        float conversionFactor = activeMode.getTickPeriod()
+        float conversionFactor = (VentilationMode.TICK_PERIOD_IN_MS / 1000f)
                 / (float) settings.getSetting(InspiratoryTime.NAME).getValue();
         float tidalVolumePerTick = (float) settings.getSetting(TidalVolume.NAME).getValue() * conversionFactor;
         ((VolumeTargeter) activeMode).setVolumeTarget(tidalVolumePerTick);

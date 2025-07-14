@@ -26,8 +26,8 @@ public abstract class Settings implements Iterable<Setting> {
     }
 
     protected Settings(Map<String, Setting> modeSpecificSettings) {
-        addSetting(FiO2.NAME, new FiO2(0.50));
-        addSetting(Peep.NAME, new Peep(5));
+        addSetting(FiO2.NAME, new FiO2());
+        addSetting(Peep.NAME, new Peep());
         this.trigger = new NoTrigger();
 
         if (modeSpecificSettings != null) {

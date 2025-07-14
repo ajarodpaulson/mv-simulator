@@ -26,20 +26,21 @@ public class Cmv implements BreathSequence {
      */
     @Override
     public void determinePhase() {
-        VentilationMode<?> activeMode = vtr.getActiveMode();
+        VentilationMode<?> activeMode = vtr.getController().getActiveMode();
         Settings settings = activeMode.getSettings();
         Trigger trigger = settings.getTrigger();
         float iTime = (float) settings.getSetting(InspiratoryTime.NAME).getValue();
-        float eTime = 60 / (float) settings.getSetting(RespiratoryRate.NAME).getValue() - iTime;
+        float breathCycleDuration = 60f / settings.getSetting(RespiratoryRate.NAME).getValue().intValue();
+        float eTime = breathCycleDuration - iTime;
 
         if (trigger.hasTriggered(vtr)) {
             activeMode.setIsInInspiratoryPhase(true);
         } else if (activeMode.getIsInInspiratoryPhase()) {
-            if (iTime >= activeMode.getTimeInPhaseInMS() * 1000) {
+            if (activeMode.getTimeInPhaseInMS() / 1000f >= iTime) {
                 activeMode.setIsInInspiratoryPhase(false);
             }
         } else {
-            if (eTime >= activeMode.getTimeInPhaseInMS() * 1000) {
+            if (activeMode.getTimeInPhaseInMS() / 1000f >= eTime) {
                 activeMode.setIsInInspiratoryPhase(true);
             }
         }

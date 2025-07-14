@@ -14,10 +14,10 @@ public class ExpFlowSensor implements Observer {
 
     @Override
     public void update(Ventilator vtr) {
-        if (vtr.getActiveMode().getIsInInspiratoryPhase()) {
+        if (vtr.getController().getActiveMode().getIsInInspiratoryPhase()) {
             currentExpiratoryFlow = 0;
         } else {
-            currentExpiratoryFlow = vtr.getLungSim().getVolumeChange() / (VentilationMode.tickPeriodInMS * 1000);
+            currentExpiratoryFlow = vtr.getLungSim().getVolumeChange() / (VentilationMode.TICK_PERIOD_IN_MS / 1000f);
         }
     }
     

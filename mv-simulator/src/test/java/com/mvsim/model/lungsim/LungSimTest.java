@@ -30,10 +30,10 @@ public class LungSimTest {
     @Test void testGetPressureChangePerTick() {
         assertEquals(ls.getPressureChangePerTick(0f), 0);
         
-        assertEquals(15f * ((VentilationMode.tickPeriodInMS / 1000f) / 5*ls.getTimeConstant()), ls.getPressureChangePerTick(15));
+        assertEquals(15f * ((VentilationMode.TICK_PERIOD_IN_MS / 1000f) / 5*ls.getTimeConstant()), ls.getPressureChangePerTick(15));
         // shouldn't change
-        assertEquals(15f * ((VentilationMode.tickPeriodInMS / 1000f) / 5*ls.getTimeConstant()), ls.getPressureChangePerTick(15));
+        assertEquals(15f * ((VentilationMode.TICK_PERIOD_IN_MS / 1000f) / 5*ls.getTimeConstant()), ls.getPressureChangePerTick(15));
         // should change
-        assertEquals(5f * ((VentilationMode.tickPeriodInMS / 1000f) / 5*ls.getTimeConstant()), ls.getPressureChangePerTick(5));
+        assertEquals(5f * ((VentilationMode.TICK_PERIOD_IN_MS / 1000f) / 5*ls.getTimeConstant()), ls.getPressureChangePerTick(5));
     }
 }

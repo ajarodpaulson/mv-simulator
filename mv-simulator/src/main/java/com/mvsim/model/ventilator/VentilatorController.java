@@ -10,7 +10,7 @@ import com.mvsim.model.ventilator.settings.Settings;
 
 /**
  * The ventilator's controller is responsible for serving as the intermediary
- * between the user/simulation manager and the ventilator. The controller
+ * between clients of the ventilator and the ventilator itself. The controller
  * accepts user input and uses it to configure the ventilator. The controller is
  * also responsible for serving pertinent information from the ventilator to the
  * user/simulation manager.
@@ -28,7 +28,7 @@ public class VentilatorController {
      * 
      * @param selectedModeTAG
      */
-    public void setActiveMode(ModeTAG selectedModeTAG) {
+    public void setActiveModeWithCorrespondingDefaultSettings(ModeTAG selectedModeTAG) {
         vtr.setActiveMode(vtr.getModeTable().getMode(selectedModeTAG));
     }
 
@@ -98,13 +98,13 @@ public class VentilatorController {
 
     public float getCurrentSystemVolumeChange() {
         if (vtr.getActiveMode().getIsInInspiratoryPhase()) {
-            return vtr.getInspFlowSensor().getLatestInspiratoryFlowReading() * (VentilationMode.tickPeriodInMS / 1000);
+            return vtr.getInspFlowSensor().getLatestInspiratoryFlowReading() * (VentilationMode.TICK_PERIOD_IN_MS / 1000f);
         } else {
-            return vtr.getExpFlowSensor().getCurrentExpiratoryFlow() * (VentilationMode.tickPeriodInMS / 1000);
+            return vtr.getExpFlowSensor().getCurrentExpiratoryFlow() * (VentilationMode.TICK_PERIOD_IN_MS / 1000f);
         }
     }
 
     public int getTickPeriodInMs() {
-        return VentilationMode.tickPeriodInMS;
+        return VentilationMode.TICK_PERIOD_IN_MS;
     }
 }
