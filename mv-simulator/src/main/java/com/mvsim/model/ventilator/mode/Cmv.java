@@ -10,6 +10,9 @@ import com.mvsim.model.ventilator.settings.Trigger;
  * Represents an algorithm for breath sequence behaviour in the strategy
  * pattern. This algorithm delivers only mandatory breaths.
  */
+/*
+ * XXX: Logic when iTime % tick period != 0 or eTime % tick period != 0
+ */
 public class Cmv implements BreathSequence {
     Ventilator vtr;
 

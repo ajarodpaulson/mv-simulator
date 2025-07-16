@@ -12,14 +12,19 @@ import com.mvsim.model.ventilator.mode.VentilationMode;
  * TODO: any utility in adding the builder pattern here?
  */
 public class LungSim {
+    private static final float TOL = 0.00001f;
     private float compliance;
     private float resistance;
     private BreathingPattern breathingPattern;
-    private float currentVolumeInLung =  0.0f;
+    private float currentVolumeInLung = 0.0f;
     private float currentPressureInLung = 0.0f;
     private float prevVtrPressure = Float.MIN_VALUE;
     private float currentPressureChangePerTick = 0;
     private float volumeChange;
+
+    private boolean pressureAndVolumeInLungAreSame() {
+        return (currentPressureInLung >= currentVolumeInLung / compliance - TOL ||  currentPressureInLung <= currentVolumeInLung / compliance + TOL);
+    }
 
     public float getVolumeChange() {
         return volumeChange;
@@ -47,8 +52,9 @@ public class LungSim {
         if (currentVtrPressure == prevVtrPressure) {
             return currentPressureChangePerTick;
         } else {
-            return Math.abs(currentPressureInLung - currentVtrPressure)
+            currentPressureChangePerTick = Math.abs(currentPressureInLung - currentVtrPressure)
                     * ((VentilationMode.TICK_PERIOD_IN_MS / 1000f) / (5 * getTimeConstant()));
+            return currentPressureChangePerTick;
         }
     }
 
@@ -85,15 +91,15 @@ public class LungSim {
      * @param volumeToAdd Volume in mL
      */
     public void addVolume(float volumeToAdd) {
-        assert currentPressureInLung == currentVolumeInLung / compliance;
+        assert pressureAndVolumeInLungAreSame();
         currentVolumeInLung += volumeToAdd;
         updateCurrentPressure();
-        assert currentPressureInLung == currentVolumeInLung / compliance;
+        assert pressureAndVolumeInLungAreSame();
     }
 
     private void updateCurrentPressure() {
         currentPressureInLung = currentVolumeInLung / compliance;
-        assert currentPressureInLung == currentVolumeInLung / compliance;
+        assert pressureAndVolumeInLungAreSame();
     }
 
     /**
@@ -112,8 +118,8 @@ public class LungSim {
      * @param vtrPressure Pressure in cmH20
      */
     public void equilibratePressure(float vtrPressure) {
-        assert currentPressureInLung == currentVolumeInLung / compliance;
-        if (vtrPressure == currentPressureInLung) {
+        assert pressureAndVolumeInLungAreSame();
+        if (vtrPressure == currentPressureInLung) { // XXX: add some tolerance here?
             return;
         } else if (vtrPressure > currentPressureInLung) {
             currentPressureInLung += getPressureChangePerTick(vtrPressure);
@@ -121,14 +127,14 @@ public class LungSim {
             currentPressureInLung -= getPressureChangePerTick(vtrPressure);
         }
         updateCurrentVolume();
-        assert currentPressureInLung == currentVolumeInLung / compliance;
+        assert pressureAndVolumeInLungAreSame();
     }
 
     private void updateCurrentVolume() {
         float newVolume = currentPressureInLung * compliance;
         this.volumeChange = Math.abs(newVolume - currentVolumeInLung);
         currentVolumeInLung = newVolume;
-        assert currentPressureInLung == currentVolumeInLung / compliance;
+        assert pressureAndVolumeInLungAreSame();
     }
 
     /**
