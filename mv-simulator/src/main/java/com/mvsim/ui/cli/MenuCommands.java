@@ -10,7 +10,6 @@ public enum MenuCommands {
     SELECT_VENT_MODE_AND_SETTINGS("Select a ventilation mode and settings", "m"),
     START_VENTILATION("Start ventilation", "b"),
     CHANGE_VENTILATION("Change ventilation settings",  "c"),
-    STOP_VENTILATION("Stop ventilation", "e"),
     QUIT_APPLICATION("Exit the application", "q");
     
     private final String message;

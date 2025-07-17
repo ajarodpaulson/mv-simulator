@@ -97,4 +97,8 @@ public class SimulationManager {
     public float getCurrentSystemVolumeChange() {
         return vtrController.getCurrentSystemVolumeChange();
     }
+
+    public void stopSimulation() {
+        vtrController.stopVentilation();
+    }
 }

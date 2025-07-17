@@ -17,17 +17,26 @@ public class LungSim {
     private float resistance;
     private BreathingPattern breathingPattern;
     private float currentVolumeInLung = 0.0f;
-    private float currentPressureInLung = 0.0f;
+    private float currentStaticPressureInLung = 0.0f;
+    private float currentDynamicPressureInLung = 0.0f;
     private float prevVtrPressure = Float.MIN_VALUE;
     private float currentPressureChangePerTick = 0;
     private float volumeChange;
 
     private boolean pressureAndVolumeInLungAreSame() {
-        return (currentPressureInLung >= currentVolumeInLung / compliance - TOL ||  currentPressureInLung <= currentVolumeInLung / compliance + TOL);
+        return (currentStaticPressureInLung >= currentVolumeInLung / compliance - TOL ||  currentStaticPressureInLung <= currentVolumeInLung / compliance + TOL);
     }
 
     public float getVolumeChange() {
         return volumeChange;
+    }
+
+    public void setCurrentDynamicPressureInLung(float flowRate) {
+        currentDynamicPressureInLung = currentStaticPressureInLung + flowRate * (resistance / 1000f);
+    }
+
+     public float getCurrentDynamicPressureInLung() {
+        return currentDynamicPressureInLung;
     }
 
     public LungSim(float compliance, float resistance) {
@@ -52,7 +61,7 @@ public class LungSim {
         if (currentVtrPressure == prevVtrPressure) {
             return currentPressureChangePerTick;
         } else {
-            currentPressureChangePerTick = Math.abs(currentPressureInLung - currentVtrPressure)
+            currentPressureChangePerTick = Math.abs(currentStaticPressureInLung - currentVtrPressure)
                     * ((VentilationMode.TICK_PERIOD_IN_MS / 1000f) / (5 * getTimeConstant()));
             return currentPressureChangePerTick;
         }
@@ -93,12 +102,13 @@ public class LungSim {
     public void addVolume(float volumeToAdd) {
         assert pressureAndVolumeInLungAreSame();
         currentVolumeInLung += volumeToAdd;
-        updateCurrentPressure();
+        updateCurrentPressure(volumeToAdd);
         assert pressureAndVolumeInLungAreSame();
     }
 
-    private void updateCurrentPressure() {
-        currentPressureInLung = currentVolumeInLung / compliance;
+    private void updateCurrentPressure(float volumeToAdd) {
+        currentStaticPressureInLung = currentVolumeInLung / compliance;
+        setCurrentDynamicPressureInLung(volumeToAdd / (VentilationMode.TICK_PERIOD_IN_MS / 1000f));
         assert pressureAndVolumeInLungAreSame();
     }
 
@@ -119,19 +129,20 @@ public class LungSim {
      */
     public void equilibratePressure(float vtrPressure) {
         assert pressureAndVolumeInLungAreSame();
-        if (vtrPressure == currentPressureInLung) { // XXX: add some tolerance here?
+        if (vtrPressure == currentStaticPressureInLung) { // XXX: add some tolerance here?
             return;
-        } else if (vtrPressure > currentPressureInLung) {
-            currentPressureInLung += getPressureChangePerTick(vtrPressure);
+        } else if (vtrPressure > currentStaticPressureInLung) {
+            currentStaticPressureInLung += getPressureChangePerTick(vtrPressure);
         } else {
-            currentPressureInLung -= getPressureChangePerTick(vtrPressure);
+            currentStaticPressureInLung -= getPressureChangePerTick(vtrPressure);
         }
         updateCurrentVolume();
+        setCurrentDynamicPressureInLung(volumeChange / (VentilationMode.TICK_PERIOD_IN_MS / 1000f));
         assert pressureAndVolumeInLungAreSame();
     }
 
     private void updateCurrentVolume() {
-        float newVolume = currentPressureInLung * compliance;
+        float newVolume = currentStaticPressureInLung * compliance;
         this.volumeChange = Math.abs(newVolume - currentVolumeInLung);
         currentVolumeInLung = newVolume;
         assert pressureAndVolumeInLungAreSame();
@@ -142,7 +153,7 @@ public class LungSim {
      * 
      * @return Current pressure in cmH2O
      */
-    public float getCurrentPressureInLung() {
-        return currentPressureInLung;
+    public float getCurrentStaticPressureInLung() {
+        return currentStaticPressureInLung;
     }
 }

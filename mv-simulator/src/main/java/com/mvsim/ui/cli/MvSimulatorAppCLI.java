@@ -77,9 +77,6 @@ public class MvSimulatorAppCLI {
             case CHANGE_VENTILATION:
                 changeVentilation();
                 break;
-            case STOP_VENTILATION:
-                stopVentilation();
-                break;
             case QUIT_APPLICATION:
                 System.out.println("Thanks for using the Mechanical Ventilation simulator!");
                 this.isProgramRunning = false;
@@ -93,11 +90,6 @@ public class MvSimulatorAppCLI {
     private void changeVentilation() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'changeVentilation'");
-    }
-
-    private void stopVentilation() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'stopVentilation'");
     }
 
     /**
@@ -128,19 +120,21 @@ public class MvSimulatorAppCLI {
             return;
         }
 
-        Thread displayThread = new Thread(() -> {
-            System.out.println("\n\n\n");
+        System.out.println("Press Enter to stop ventilation...");
 
+        Thread displayThread = new Thread(() -> {
             while (simMgr.isVentilating()) {
                 String pressureData = String.format("%.2f", simMgr.getCurrentSystemPressure());
                 String flowData = String.format("%.2f", simMgr.getCurrentSystemFlowrate());
                 String volumeData = String.format("%.2f", simMgr.getCurrentSystemVolumeChange());
 
                 synchronized (System.out) {
-                    System.out.print("\033[3A");
-                    System.out.printf("Pressure: %-50s\n", pressureData);
-                    System.out.printf("Flow:     %-50s\n", flowData);
-                    System.out.printf("Volume:   %-50s\n", volumeData);
+                    // Clear screen and return to home position
+                    System.out.print("\033[H\033[2J");  
+                    System.out.printf("Pressure: %s\n", pressureData);
+                    System.out.printf("Flow:     %s\n", flowData);
+                    System.out.printf("Volume:   %s\n", volumeData);
+                    System.out.println("\nPress Enter to stop ventilation...");
                 }
 
                 try {
@@ -151,16 +145,23 @@ public class MvSimulatorAppCLI {
             }
         });
 
-        // You will need an input thread here to stop the simulation
-        // For now, we just start the display thread
+        // This thread's only job is to wait for input
+        Thread inputThread = new Thread(() -> {
+            scanner.nextLine();
+            simMgr.stopSimulation();
+        });
+
         displayThread.start();
+        inputThread.start();
 
         try {
             displayThread.join();
-            System.out.println("\nVentilation stopped.");
+            inputThread.join();
+            System.out.println("Ventilation stopped.");
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            System.out.println("Ventilation was interrupted.");
+            System.out.println("\nVentilation was interrupted.");
         }
     }
 

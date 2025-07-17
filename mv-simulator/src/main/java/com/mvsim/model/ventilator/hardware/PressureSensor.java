@@ -19,6 +19,6 @@ public class PressureSensor implements Observer {
 
     @Override
     public void update(Ventilator vtr) {
-        currentSystemPressure = vtr.getLungSim().getCurrentPressureInLung();
+        currentSystemPressure = vtr.getLungSim().getCurrentDynamicPressureInLung();
     }
 }

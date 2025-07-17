@@ -17,6 +17,7 @@ import com.mvsim.model.ventilator.settings.Settings;
  */
 public class VentilatorController {
     Ventilator vtr;
+    private float systemVolumeChange = 0f;
 
     public VentilatorController(Ventilator vtr) {
         this.vtr = vtr;
@@ -98,9 +99,11 @@ public class VentilatorController {
 
     public float getCurrentSystemVolumeChange() {
         if (vtr.getActiveMode().getIsInInspiratoryPhase()) {
-            return vtr.getInspFlowSensor().getLatestInspiratoryFlowReading() * (VentilationMode.TICK_PERIOD_IN_MS / 1000f);
+            systemVolumeChange += vtr.getInspFlowSensor().getLatestInspiratoryFlowReading() * (VentilationMode.TICK_PERIOD_IN_MS / 1000f);
+            return systemVolumeChange;
         } else {
-            return vtr.getExpFlowSensor().getCurrentExpiratoryFlow() * (VentilationMode.TICK_PERIOD_IN_MS / 1000f);
+            systemVolumeChange -= vtr.getExpFlowSensor().getCurrentExpiratoryFlow() * (VentilationMode.TICK_PERIOD_IN_MS / 1000f);
+            return systemVolumeChange;
         }
     }
 
