@@ -17,6 +17,8 @@ public class SimulationManager {
 
     private SimulationManager() {
         this.vtr = new Ventilator();
+        this.lungSim = new LungSim();
+        vtr.setLungSim(lungSim);
         this.vtrController = vtr.getController();
     }
 
@@ -50,9 +52,8 @@ public class SimulationManager {
      * 
      * @param lungSim
      */
-    public void setLungSim(LungSim lungSim) {
-        this.lungSim = lungSim;
-        this.vtr.setLungSim(lungSim);
+    public void configureLungSim(LungSimSetting name, Number value) {
+        lungSim.setSetting(name, value);
     }
 
     /**

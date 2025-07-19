@@ -45,36 +45,39 @@ public class MvSimulatorAppGUI extends JFrame implements WindowListener {
         gbc.insets = new Insets(2, 2, 2, 2); // Add a small gap between components
         
         // InfoPanel: 90% width, 10% height at the top
-        gbc.gridx = 0;
+        gbc.gridx = 1;
         gbc.gridy = 0;
-        gbc.gridwidth = 2; // Spans menu + waveform columns
+        gbc.gridwidth = 2; // Spans menu + metrics columns
+        gbc.gridheight = 1;
         gbc.weightx = 0.9;
         gbc.weighty = 0.1;
         add(infoPanel, gbc);
         
         // MenuPanel: 10% width, 80% height on the left
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 0;
         gbc.gridwidth = 1;
+        gbc.gridheight = 2; // spans info and waveforms rows
         gbc.weightx = 0.1;
-        gbc.weighty = 0.8;
+        gbc.weighty = 0.9;
         add(menuPanel, gbc);
         
         // WaveformPanel: 60% width, 80% height in the center
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
+        gbc.gridheight = 1;
         gbc.weightx = 0.6;
         gbc.weighty = 0.8;
         add(waveformPanel, gbc);
         
         // MetricsPanel: 30% width, 80% height on the right
         gbc.gridx = 2;
-        gbc.gridy = 0; // Start at the top
+        gbc.gridy = 1; // Start at the top
         gbc.gridwidth = 1;
-        gbc.gridheight = 2; // Spans both info and waveform rows
+        gbc.gridheight = 1; // Spans both info and waveform rows
         gbc.weightx = 0.3;
-        gbc.weighty = 0.9; // Takes up info + waveform height (0.1 + 0.8)
+        gbc.weighty = 0.8; // Takes up info + waveform height (0.1 + 0.8)
         add(metricsPanel, gbc);
         
         // SettingsPanel: 100% width, 10% height at the bottom
@@ -91,7 +94,7 @@ public class MvSimulatorAppGUI extends JFrame implements WindowListener {
         
         // Get screen size for splash image
         Dimension screenSize = getToolkit().getScreenSize();
-        displaySplashImage(screenSize);
+        // displaySplashImage(screenSize); XXX
         
         // Make sure the window is centered
         setLocationRelativeTo(null);

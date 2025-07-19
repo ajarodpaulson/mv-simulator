@@ -1,8 +1,8 @@
 package com.mvsim.model.ventilator.mode;
 
+import com.mvsim.model.Setting;
 import com.mvsim.model.ventilator.settings.InspiratoryTime;
 import com.mvsim.model.ventilator.settings.RespiratoryRate;
-import com.mvsim.model.ventilator.settings.Setting;
 import com.mvsim.model.ventilator.settings.Settings;
 import com.mvsim.model.ventilator.settings.TidalVolume;
 import java.util.LinkedHashMap;

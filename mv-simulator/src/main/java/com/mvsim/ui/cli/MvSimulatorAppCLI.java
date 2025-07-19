@@ -3,13 +3,15 @@ package com.mvsim.ui.cli;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import com.mvsim.model.LungSimSetting;
+import com.mvsim.model.Setting;
 import com.mvsim.model.SimulationManager;
 import com.mvsim.model.Units;
 import com.mvsim.model.exception.ActiveModeNotSetException;
 import com.mvsim.model.exception.PreconditionViolatedException;
 import com.mvsim.model.lungsim.LungSim;
 import com.mvsim.model.ventilator.mode.ModeTAG;
-import com.mvsim.model.ventilator.settings.Setting;
 import com.mvsim.ui.cli.exception.MenuCommandNotFoundException;
 
 public class MvSimulatorAppCLI {
@@ -62,7 +64,7 @@ public class MvSimulatorAppCLI {
         printDivider();
         switch (cmd) {
             case CREATE_NEW_LUNG_SIM:
-                createNewLungSim();
+                configureLungSim();
                 break;
             case SELECT_VENT_MODE_AND_SETTINGS:
                 try {
@@ -212,16 +214,20 @@ public class MvSimulatorAppCLI {
     /**
      * A sequence of input-requiring questions to configure the lung simulator.
      */
-    private void createNewLungSim() {
+    private void configureLungSim() {
         System.out.println("Enter the lung compliance in " + Units.COMPLIANCE.getNotation() + " (normal is 50-170):");
         float compliance = this.scanner.nextFloat();
         this.scanner.nextLine();
+
+        this.simMgr.configureLungSim(LungSimSetting.COMPLIANCE, compliance);
 
         System.out.println("Enter the lung resistance in " + Units.RESISTANCE.getNotation() + " (normal is 0.6-2.4):");
         float resistance = this.scanner.nextFloat();
         this.scanner.nextLine();
 
-        this.simMgr.setLungSim(new LungSim(compliance, resistance));
+        this.simMgr.configureLungSim(LungSimSetting.RESISTANCE, resistance);
+
+        
 
         System.out.println("The lung sim is configured!");
     }

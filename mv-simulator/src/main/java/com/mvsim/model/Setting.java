@@ -1,6 +1,4 @@
-package com.mvsim.model.ventilator.settings;
-
-import com.mvsim.model.Units;
+package com.mvsim.model;
 
 public abstract class Setting {
     private final String name;
@@ -13,7 +11,7 @@ public abstract class Setting {
      * @param staticUnits static unit property of the concrete class
      * @param value
      */
-    /*
+    protected /*
      * XXX: There is no compiler enforcement of the pattern you are using to
      * instantiate your concrete classes. Needs work.
      */

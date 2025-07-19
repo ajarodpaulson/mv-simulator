@@ -1,5 +1,6 @@
 package com.mvsim.model.ventilator.settings;
 
+import com.mvsim.model.Setting;
 import com.mvsim.model.Units;
 
 public class TidalVolume extends Setting {

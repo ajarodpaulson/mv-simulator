@@ -1,5 +1,6 @@
 package com.mvsim.model.lungsim;
 
+import com.mvsim.model.LungSimSetting;
 import com.mvsim.model.ventilator.mode.VentilationMode;
 
 /**
@@ -13,7 +14,8 @@ import com.mvsim.model.ventilator.mode.VentilationMode;
  */
 public class LungSim {
     private static final float TOL = 0.00001f;
-    private float compliance;
+    private LungSimSettings lungSimSettings;
+    private float compliance; // XXX get rid of this eventually? not sure. much easier to refer to like this
     private float resistance;
     private BreathingPattern breathingPattern;
     private float currentVolumeInLung = 0.0f;
@@ -39,9 +41,10 @@ public class LungSim {
         return currentDynamicPressureInLung;
     }
 
-    public LungSim(float compliance, float resistance) {
-        this.compliance = compliance;
-        this.resistance = resistance;
+    public LungSim() {
+        this.lungSimSettings = new LungSimSettings();
+        this.compliance = lungSimSettings.getSetting(LungSimSetting.COMPLIANCE).floatValue();
+        this.resistance = lungSimSettings.getSetting(LungSimSetting.RESISTANCE).floatValue();
         this.breathingPattern = null;
     }
 
@@ -75,20 +78,8 @@ public class LungSim {
         this.breathingPattern = breathingPattern;
     }
 
-    public float getCompliance() {
-        return compliance;
-    }
-
-    public void setCompliance(float compliance) {
-        this.compliance = compliance;
-    }
-
-    public float getResistance() {
-        return resistance;
-    }
-
-    public void setResistance(float resistance) {
-        this.resistance = resistance;
+    public LungSimSettings getSettings() {
+        return lungSimSettings;
     }
 
     /**
@@ -155,5 +146,9 @@ public class LungSim {
      */
     public float getCurrentStaticPressureInLung() {
         return currentStaticPressureInLung;
+    }
+
+    public void setSetting(LungSimSetting name, Number value) {
+
     }
 }

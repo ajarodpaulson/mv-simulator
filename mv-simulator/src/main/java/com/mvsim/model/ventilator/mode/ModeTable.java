@@ -10,6 +10,9 @@ import com.mvsim.model.ventilator.Ventilator;
 /**
  * Represents a table with the ventilator's available modes that should be used to construct a mode from a supplied ModeType.
  */
+/*
+ * XXX: factory pattern?
+ */
 public class ModeTable {
 
     private final Map<ModeTAG, VentilationMode<?>> modeTable = new LinkedHashMap<>();
