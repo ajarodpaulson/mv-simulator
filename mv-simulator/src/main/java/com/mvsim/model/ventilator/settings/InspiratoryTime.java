@@ -12,7 +12,7 @@ public class InspiratoryTime extends Setting {
     // TODO: the value of inspiratory time needs to be a multiple of
     // VentilationMode.TICK_PERIOD_IN_MS, need to enforce this
     public InspiratoryTime(Number value) {
-        super(InspiratoryTime.NAME, InspiratoryTime.UNITS, value);
+        super(InspiratoryTime.NAME, InspiratoryTime.UNITS, value, 0f, 60f, 0.05f);
     }
 
     public InspiratoryTime() {

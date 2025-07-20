@@ -10,7 +10,7 @@ public class TidalVolume extends Setting {
     public static final float DEFAULT_VALUE = 350f;
 
     public TidalVolume(Number value) {
-        super(TidalVolume.NAME, TidalVolume.UNITS, value);
+        super(TidalVolume.NAME, TidalVolume.UNITS, value, 0f, 5000f, 10f);
     }
 
     public TidalVolume() {

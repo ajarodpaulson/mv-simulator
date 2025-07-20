@@ -110,4 +110,8 @@ public class VentilatorController {
     public int getTickPeriodInMs() {
         return VentilationMode.TICK_PERIOD_IN_MS;
     }
+
+    public void setModeSetting(String label, float value) {
+        vtr.getActiveMode().getSettings().setSetting(label, value);
+    }
 }

@@ -9,7 +9,7 @@ public class Peep extends Setting {
     public static final float DEFAULT_VALUE = 5.0f;
 
     Peep(Number value) {
-        super(Peep.NAME, Peep.UNITS, value);
+        super(Peep.NAME, Peep.UNITS, value, 0f, 100f, 0.5f);
     }
 
     public Peep() {

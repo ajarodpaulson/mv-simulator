@@ -14,6 +14,7 @@ import com.mvsim.model.ventilator.hardware.PressureSensor;
 import com.mvsim.model.ventilator.mode.ModeTAG;
 import com.mvsim.model.ventilator.mode.ModeTable;
 import com.mvsim.model.ventilator.mode.VentilationMode;
+import com.mvsim.model.ventilator.mode.VcCmvSetpoint;
 
 /**
  * Represents a ventilator that can have a single active mode and a single lung
@@ -73,6 +74,7 @@ public class Ventilator extends Observable {
         this.modeTable = new ModeTable(this);
         this.controller = new VentilatorController(this);
         isVentilationEnabled = new AtomicBoolean(false);
+        this.activeMode = new VcCmvSetpoint(this); // default mode
 
         this.addObserver(pressureSensor);
         this.addObserver(inspFlowSensor);

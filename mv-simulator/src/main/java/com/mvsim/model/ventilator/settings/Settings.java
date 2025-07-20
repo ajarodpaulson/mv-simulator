@@ -57,4 +57,8 @@ public abstract class Settings implements Iterable<Setting> {
     public Iterator<Setting> iterator() {
         return settingsMap.values().iterator();
     }
+
+    public void setSetting(String label, float value) {
+        settingsMap.get(label).setValue(value);
+    }
 }

@@ -10,7 +10,7 @@ public class RespiratoryRate extends Setting {
     public static final int DEFAULT_VALUE = 16;
 
     public RespiratoryRate(Number value) {
-        super(RespiratoryRate.NAME, RespiratoryRate.UNITS, value);
+        super(RespiratoryRate.NAME, RespiratoryRate.UNITS, value, 0f, 100f, 1f);
     }
 
     public RespiratoryRate() {

@@ -1,7 +1,11 @@
 package com.mvsim.model;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import com.mvsim.model.exception.ActiveModeNotSetException;
 import com.mvsim.model.lungsim.LungSim;
+import com.mvsim.model.lungsim.LungSimSetting;
 import com.mvsim.model.ventilator.Ventilator;
 import com.mvsim.model.ventilator.VentilatorController;
 
@@ -9,7 +13,7 @@ import com.mvsim.model.ventilator.VentilatorController;
  * Represents a manager for the lung simulator and mechanical ventilation
  * simulator complex. Uses the singleton pattern.
  */
-public class SimulationManager {
+public class SimulationManager implements ChangeListener {
     private VentilatorController vtrController;
     private final Ventilator vtr;
     private LungSim lungSim;
@@ -101,5 +105,10 @@ public class SimulationManager {
 
     public void stopSimulation() {
         vtrController.stopVentilation();
+    }
+
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        
     }
 }

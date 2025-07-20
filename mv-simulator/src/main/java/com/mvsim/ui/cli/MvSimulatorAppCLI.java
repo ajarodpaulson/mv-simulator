@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import com.mvsim.model.LungSimSetting;
 import com.mvsim.model.Setting;
 import com.mvsim.model.SimulationManager;
 import com.mvsim.model.Units;
 import com.mvsim.model.exception.ActiveModeNotSetException;
 import com.mvsim.model.exception.PreconditionViolatedException;
 import com.mvsim.model.lungsim.LungSim;
+import com.mvsim.model.lungsim.LungSimSetting;
 import com.mvsim.model.ventilator.mode.ModeTAG;
 import com.mvsim.ui.cli.exception.MenuCommandNotFoundException;
 

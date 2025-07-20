@@ -26,7 +26,7 @@ public class VcCmvSetpoint extends VentilationMode<VolumeBased> implements Volum
     }
 
 
-    VcCmvSetpoint(Ventilator vtr) {
+    public VcCmvSetpoint(Ventilator vtr) {
         super(vtr, new VolumeControl(vtr), new Cmv(vtr), new VolumeSetPoint(vtr), new VcCmvSetpointSettings());
     }
 }

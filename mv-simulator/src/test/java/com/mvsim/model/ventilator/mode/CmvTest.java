@@ -19,7 +19,7 @@ public class CmvTest {
     @BeforeEach
     public void setup() {
         this.vtr = new Ventilator();
-        vtr.setLungSim(new LungSim(100, 1.0f));
+        vtr.setLungSim(new LungSim());
         vtr.getController()
                 .setActiveModeWithCorrespondingDefaultSettings(new ModeTAG(ControlVariableType.VOLUME_CONTROL,
                         BreathSequenceType.CONTINUOUS_MANDATORY_VENTILATION, TargetingSchemeType.SET_POINT));

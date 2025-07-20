@@ -1,6 +1,5 @@
 package com.mvsim.model.lungsim;
 
-import com.mvsim.model.LungSimSetting;
 import com.mvsim.model.ventilator.mode.VentilationMode;
 
 /**
@@ -149,6 +148,16 @@ public class LungSim {
     }
 
     public void setSetting(LungSimSetting name, Number value) {
-
+        lungSimSettings.setSetting(name, value);
+        
+        // Update cached values XXX do I want to get rid of this later?
+        switch (name) {
+            case COMPLIANCE:
+                this.compliance = value.floatValue();
+                break;
+            case RESISTANCE:
+                this.resistance = value.floatValue();
+                break;
+        }
     }
 }

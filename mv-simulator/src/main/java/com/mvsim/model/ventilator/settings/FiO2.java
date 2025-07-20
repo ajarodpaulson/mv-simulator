@@ -10,7 +10,7 @@ public class FiO2 extends Setting {
     public static final float DEFAULT_VALUE = 0.5f;
 
     FiO2(Number value) {
-        super(FiO2.NAME, FiO2.UNITS, value);
+        super(FiO2.NAME, FiO2.UNITS, value, 0f, 100f, 1f);
     }
 
     public FiO2() {
