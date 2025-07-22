@@ -1,7 +1,10 @@
 package com.mvsim.ui.desktop;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.util.function.Function;
+
+import javax.swing.JPanel;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -12,71 +15,42 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-public class WaveformPanel extends JPanel {
-    private final XYSeries pressureSeries;
-    private final XYSeries flowSeries;
-    private final XYSeries volumeSeries;
+import com.mvsim.model.observer.SimMgrObserver;
+import com.mvsim.model.ventilator.MostRecentTickData;
 
-    public WaveformPanel() {
+public abstract class WaveformPanel extends JPanel implements SimMgrObserver {
+     private final XYSeries series;
+     private final Function<MostRecentTickData, Float> getSystemScalarMetric;
+
+    WaveformPanel(String scalar, String unitNotation, Color color,
+    Function<MostRecentTickData, Float> getSystemScalarMetric) {
         setLayout(new BorderLayout());
-        setBackground(Color.BLACK);
-
-        // Create series for each waveform
-        pressureSeries = new XYSeries("Pressure");
-        flowSeries     = new XYSeries("Flow");
-        volumeSeries   = new XYSeries("Volume");
-
-        // Combine into one dataset
+        this.getSystemScalarMetric = getSystemScalarMetric;
+        series = new XYSeries(scalar);
         XYSeriesCollection dataset = new XYSeriesCollection();
-        dataset.addSeries(pressureSeries);
-        dataset.addSeries(flowSeries);
-        dataset.addSeries(volumeSeries);
+        dataset.addSeries(series);
+        JFreeChart chart = ChartFactory.createXYLineChart(scalar, null, unitNotation, dataset);
 
-        // Build the chart
-        JFreeChart chart = ChartFactory.createXYLineChart(
-            null,        // no title
-            "Time (s)",  // X-axis label
-            "Value",     // Y-axis label
-            dataset      // the data
-        );
-
-        // Style the plot
         XYPlot plot = chart.getXYPlot();
         plot.setBackgroundPaint(Color.BLACK);
         plot.setDomainGridlinesVisible(false);
         plot.setRangeGridlinesVisible(false);
 
-        // Configure axes to auto-range
         NumberAxis domain = (NumberAxis) plot.getDomainAxis();
         domain.setAutoRange(true);
         NumberAxis range = (NumberAxis) plot.getRangeAxis();
         range.setAutoRange(true);
 
-        // Set distinct colors per series
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(true, false);
-        renderer.setSeriesPaint(0, Color.YELLOW);
-        renderer.setSeriesPaint(1, Color.GREEN);
-        renderer.setSeriesPaint(2, Color.CYAN);
+        renderer.setSeriesPaint(0, color);
         plot.setRenderer(renderer);
 
-        // Wrap in a ChartPanel and add to this JPanel
         ChartPanel chartPanel = new ChartPanel(chart);
         add(chartPanel, BorderLayout.CENTER);
     }
 
-    /**
-     * Backend logic should call these methods whenever a new sample arrives.
-     * The 'time' parameter could be a timestamp in seconds, or just a sample index.
-     */
-    public void addPressureSample(double time, double value) {
-        pressureSeries.add(time, value);
-    }
-
-    public void addFlowSample(double time, double value) {
-        flowSeries.add(time, value);
-    }
-
-    public void addVolumeSample(double time, double value) {
-        volumeSeries.add(time, value);
+   @Override
+    public void update(MostRecentTickData data) {
+        series.add(data.getCurrentSystemTime(), getSystemScalarMetric.apply(data));
     }
 }

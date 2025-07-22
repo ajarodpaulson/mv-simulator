@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.mvsim.model.exception.ActiveModeNotSetException;
 import com.mvsim.model.lungsim.LungSim;
 import com.mvsim.model.observer.Observable;
-import com.mvsim.model.observer.Observer;
+import com.mvsim.model.observer.VentilatorObserver;
 import com.mvsim.model.ventilator.hardware.Actuator;
 import com.mvsim.model.ventilator.hardware.ExpFlowSensor;
 import com.mvsim.model.ventilator.hardware.InspFlowSensor;
@@ -91,7 +91,7 @@ public class Ventilator extends Observable {
 
     @Override
     public void notifyObservers() {
-        for (Observer o : observers) {
+        for (VentilatorObserver o : observers) {
             o.update(this);
         }
     }

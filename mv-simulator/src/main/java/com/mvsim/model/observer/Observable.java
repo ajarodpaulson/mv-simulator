@@ -7,9 +7,9 @@ import java.util.List;
  * Represents an observable in the Observer Design Pattern
  */
 public abstract class Observable {
-    protected List<Observer> observers;
+    protected List<VentilatorObserver> observers;
 
-    public List<Observer> getObservers() {
+    public List<VentilatorObserver> getObservers() {
         return observers;
     }
 
@@ -25,7 +25,7 @@ public abstract class Observable {
      * 
      * @param o the observer to be added
      */
-    public void addObserver(Observer o) {
+    public void addObserver(VentilatorObserver o) {
         observers.add(o);
     }
 

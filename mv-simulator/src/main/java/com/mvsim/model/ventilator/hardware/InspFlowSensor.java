@@ -1,6 +1,6 @@
 package com.mvsim.model.ventilator.hardware;
 
-import com.mvsim.model.observer.Observer;
+import com.mvsim.model.observer.VentilatorObserver;
 import com.mvsim.model.ventilator.Ventilator;
 import com.mvsim.model.ventilator.mode.VentilationMode;
 
@@ -11,7 +11,7 @@ import com.mvsim.model.ventilator.mode.VentilationMode;
  * simplicity, assume that inspiratory flow is 0 during the expiratory phase.
  * TODO: determination of flow in a pressure-based mode
  */
-public class InspFlowSensor implements Observer {
+public class InspFlowSensor implements VentilatorObserver {
 
     private float currentInspiratoryFlow = 0;
 

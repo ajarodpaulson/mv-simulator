@@ -22,6 +22,10 @@ public abstract class VentilationMode<V extends ModeControlVariable> {
      * XXX: feel like these don't belong in this class.
      */
     private int tick;
+    public int getTick() {
+        return tick;
+    }
+
     private boolean isInInspiratoryPhase = true;
     public static final int TICK_PERIOD_IN_MS = 50;
 

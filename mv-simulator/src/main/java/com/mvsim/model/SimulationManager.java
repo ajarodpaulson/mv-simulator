@@ -1,11 +1,18 @@
 package com.mvsim.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.SwingUtilities;
 
 import com.mvsim.model.exception.ActiveModeNotSetException;
 import com.mvsim.model.lungsim.LungSim;
 import com.mvsim.model.lungsim.LungSimSetting;
+import com.mvsim.model.observer.Observable;
+import com.mvsim.model.observer.SimMgrObserver;
+import com.mvsim.model.ventilator.MostRecentTickData;
 import com.mvsim.model.ventilator.Ventilator;
 import com.mvsim.model.ventilator.VentilatorController;
 
@@ -13,17 +20,25 @@ import com.mvsim.model.ventilator.VentilatorController;
  * Represents a manager for the lung simulator and mechanical ventilation
  * simulator complex. Uses the singleton pattern.
  */
-public class SimulationManager implements ChangeListener {
+public class SimulationManager extends Observable implements ChangeListener {
     private VentilatorController vtrController;
     private final Ventilator vtr;
     private LungSim lungSim;
     private static SimulationManager theManager;
+    private Set<SimMgrObserver> observers;
+    private final MostRecentTickData mostRecentTickData;
 
     private SimulationManager() {
         this.vtr = new Ventilator();
         this.lungSim = new LungSim();
         vtr.setLungSim(lungSim);
         this.vtrController = vtr.getController();
+        this.observers = new HashSet<>();
+        this.mostRecentTickData = new MostRecentTickData(this);
+    }
+
+    public void addObserver(SimMgrObserver o) {
+        observers.add(o);
     }
 
     /**
@@ -75,8 +90,9 @@ public class SimulationManager implements ChangeListener {
         Thread simulationThread = new Thread(() -> {
             while (vtrController.getIsVentilating()) {
                 vtrController.tick();
+                // Only notify - don't do the data collection work here
+                notifyObservers();
                 try {
-                    // This controls the simulation speed
                     Thread.sleep(vtrController.getTickPeriodInMs());
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -110,5 +126,20 @@ public class SimulationManager implements ChangeListener {
     @Override
     public void stateChanged(ChangeEvent e) {
         
+    }
+
+    @Override
+    public void notifyObservers() {
+        // Move the data collection work here, but run it on the EDT
+        SwingUtilities.invokeLater(() -> {
+            updateMostRecentTickData(); // This is where you grab the latest tick data
+            for (SimMgrObserver o : observers) {
+                o.update(mostRecentTickData);
+            }
+        });
+    }
+
+    private void updateMostRecentTickData() {
+        mostRecentTickData.update(this);
     }
 }

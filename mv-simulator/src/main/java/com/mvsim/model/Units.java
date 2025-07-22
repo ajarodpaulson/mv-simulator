@@ -8,7 +8,8 @@ public enum Units {
     VOLUME("ml"), 
     RESP_RATE("breaths/min"), 
     TIME("s"),
-    NOT_APPLICABLE("N/A");
+    NOT_APPLICABLE("N/A"), 
+    FLOWRATE("L/min");
 
     private final String notation;
 

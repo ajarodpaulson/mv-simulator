@@ -1,6 +1,6 @@
 package com.mvsim.model.ventilator.hardware;
 
-import com.mvsim.model.observer.Observer;
+import com.mvsim.model.observer.VentilatorObserver;
 import com.mvsim.model.ventilator.Ventilator;
 
 /**
@@ -10,7 +10,7 @@ import com.mvsim.model.ventilator.Ventilator;
  * as well that this assumes an idealized pt-vtr system that is closed and
  * depends only on the patient.
  */
-public class PressureSensor implements Observer {
+public class PressureSensor implements VentilatorObserver {
     private float currentSystemPressure = 0;
 
     public float getCurrentSystemPressure() {

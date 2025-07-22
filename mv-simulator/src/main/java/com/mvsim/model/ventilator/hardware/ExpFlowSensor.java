@@ -1,10 +1,10 @@
 package com.mvsim.model.ventilator.hardware;
 
-import com.mvsim.model.observer.Observer;
+import com.mvsim.model.observer.VentilatorObserver;
 import com.mvsim.model.ventilator.Ventilator;
 import com.mvsim.model.ventilator.mode.VentilationMode;
 
-public class ExpFlowSensor implements Observer {
+public class ExpFlowSensor implements VentilatorObserver {
 
     private float currentExpiratoryFlow = 0;
 

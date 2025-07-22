@@ -36,7 +36,7 @@ public class MvSimulatorAppGUI extends JFrame implements WindowListener {
         // Create panels
         JPanel menuPanel = new MenuPanel();
         JPanel infoPanel = new InfoPanel();
-        JPanel waveformPanel = new WaveformPanel();
+        JPanel waveformsPanel = new WaveformPanels();
         JPanel metricsPanel = new MetricsPanel();
         JPanel settingsPanel = new SettingsPanel();
         
@@ -58,18 +58,18 @@ public class MvSimulatorAppGUI extends JFrame implements WindowListener {
         gbc.gridy = 0;
         gbc.gridwidth = 1;
         gbc.gridheight = 2; // spans info and waveforms rows
-        gbc.weightx = 0.1;
+        gbc.weightx = 0.1; // This ensures it stays at 10% width
         gbc.weighty = 0.9;
         add(menuPanel, gbc);
         
-        // WaveformPanel: 60% width, 80% height in the center
+        // WaveformArea: 60% width, 80% height in the center
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
         gbc.weightx = 0.6;
         gbc.weighty = 0.8;
-        add(waveformPanel, gbc);
+        add(waveformsPanel, gbc);
         
         // MetricsPanel: 30% width, 80% height on the right
         gbc.gridx = 2;
