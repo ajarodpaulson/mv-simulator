@@ -72,16 +72,16 @@ public class Ventilator extends Observable {
         this.pressureSensor = new PressureSensor();
         this.actuator = new Actuator(this);
         this.modeTable = new ModeTable(this);
-        this.controller = new VentilatorController(this);
-        isVentilationEnabled = new AtomicBoolean(false);
         this.activeMode = new VcCmvSetpoint(this); // default mode
+        isVentilationEnabled = new AtomicBoolean(false);
+        this.controller = new VentilatorController(this);
 
         this.addObserver(pressureSensor);
         this.addObserver(inspFlowSensor);
         this.addObserver(expFlowSensor);
     }
 
-    protected VentilationMode<?> getActiveMode() {
+    public VentilationMode<?> getActiveMode() {
         return activeMode;
     }
 

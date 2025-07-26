@@ -1,9 +1,13 @@
 package com.mvsim.model.ventilator;
 
+import java.util.Map.Entry;
 import java.util.Set;
 
 import com.mvsim.model.exception.ActiveModeNotSetException;
 import com.mvsim.model.exception.PreconditionViolatedException;
+import com.mvsim.model.ventilator.metrics.Metric;
+import com.mvsim.model.ventilator.metrics.MetricName;
+import com.mvsim.model.ventilator.metrics.Metrics;
 import com.mvsim.model.ventilator.mode.ModeTAG;
 import com.mvsim.model.ventilator.mode.VentilationMode;
 import com.mvsim.model.ventilator.settings.Settings;
@@ -16,11 +20,19 @@ import com.mvsim.model.ventilator.settings.Settings;
  * user/simulation manager.
  */
 public class VentilatorController {
-    Ventilator vtr;
+    private Ventilator vtr;
+    private Metrics metrics;
     private float systemVolumeChange = 0f;
 
     public VentilatorController(Ventilator vtr) {
         this.vtr = vtr;
+        this.metrics = new Metrics(vtr);
+    }
+
+    // XXX: code smell? should the controller be responsible for updating the
+    // metrics? should i be caching metrics at all?
+    public Metrics getMetrics() {
+        return metrics;
     }
 
     /**
@@ -75,6 +87,7 @@ public class VentilatorController {
      */
     public void tick() {
         vtr.tick();
+        metrics.update(); // XXX: appropriate? or should we be using the observer pattern?
     }
 
     public Set<ModeTAG> getAvailableModes() {
@@ -99,10 +112,12 @@ public class VentilatorController {
 
     public float getCurrentSystemVolumeChange() {
         if (vtr.getActiveMode().getIsInInspiratoryPhase()) {
-            systemVolumeChange += vtr.getInspFlowSensor().getLatestInspiratoryFlowReading() * (VentilationMode.TICK_PERIOD_IN_MS / 1000f);
+            systemVolumeChange += vtr.getInspFlowSensor().getLatestInspiratoryFlowReading()
+                    * (VentilationMode.TICK_PERIOD_IN_MS / 1000f);
             return systemVolumeChange;
         } else {
-            systemVolumeChange -= vtr.getExpFlowSensor().getCurrentExpiratoryFlow() * (VentilationMode.TICK_PERIOD_IN_MS / 1000f);
+            systemVolumeChange -= vtr.getExpFlowSensor().getCurrentExpiratoryFlow()
+                    * (VentilationMode.TICK_PERIOD_IN_MS / 1000f);
             return systemVolumeChange;
         }
     }
@@ -113,5 +128,9 @@ public class VentilatorController {
 
     public void setModeSetting(String label, float value) {
         vtr.getActiveMode().getSettings().setSetting(label, value);
+    }
+
+    public void updateMetrics() {
+        metrics.update();
     }
 }

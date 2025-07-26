@@ -1,7 +1,5 @@
 package com.mvsim.model.ventilator.settings;
 
-import com.mvsim.model.NewSetting;
-
 public enum VentilationSetting implements NewSetting{
     ;
 

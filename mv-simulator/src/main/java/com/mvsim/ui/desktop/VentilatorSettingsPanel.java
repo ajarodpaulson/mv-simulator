@@ -5,8 +5,9 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-import com.mvsim.model.Setting;
+
 import com.mvsim.model.SimulationManager;
+import com.mvsim.model.ventilator.settings.Setting;
 
 //  XXX: semantic coupling/duplication between this and LungSimSettingsPanel
 public class VentilatorSettingsPanel extends JPanel {

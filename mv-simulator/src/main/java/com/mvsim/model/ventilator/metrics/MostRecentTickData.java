@@ -1,4 +1,4 @@
-package com.mvsim.model.ventilator;
+package com.mvsim.model.ventilator.metrics;
 
 import com.mvsim.model.SimulationManager;
 
@@ -16,7 +16,7 @@ public class MostRecentTickData {
         this.currentSystemPressure = simMgr.getCurrentSystemPressure();
         this.currentSystemFlowrate = simMgr.getCurrentSystemFlowrate();
         this.currentSystemVolume = simMgr.getCurrentSystemVolumeChange();
-        this.currentSystemTime = (simMgr.getVtrController().getTickPeriodInMs() / 1000f) * simMgr.getVtrController().getActiveMode().getTick();
+        this.currentSystemTime = (simMgr.getVtrController().getTickPeriodInMs() / 1000f) * simMgr.getVtrController().getActiveMode().getTickCounter();
     }
 
     public float getCurrentSystemPressure() {

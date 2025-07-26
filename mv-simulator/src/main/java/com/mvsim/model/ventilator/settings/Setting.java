@@ -1,4 +1,6 @@
-package com.mvsim.model;
+package com.mvsim.model.ventilator.settings;
+
+import com.mvsim.model.Units;
 
 public abstract class Setting {
     private final String name;

@@ -1,34 +1,39 @@
 package com.mvsim.ui.desktop;
 
 import javax.swing.*;
+
+import com.mvsim.model.SimulationManager;
+import com.mvsim.model.ventilator.mode.ModeTAG;
+
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Set;
 
 public class InfoPanel extends JPanel {
-    private JLabel timerLabel = new JLabel("00:02");
-    private JLabel modeLabel  = new JLabel("PS/CPAP → PC");
-    private JLabel weightLabel = new JLabel("PBW 78 kg");
+    private JComboBox<ModeTAG> modePicker;
 
     public InfoPanel() {
         setLayout(new FlowLayout(FlowLayout.LEFT, 20, 8));
-        setPreferredSize(new Dimension(0, 60));
         setBackground(Color.BLACK);
 
-        timerLabel.setForeground(Color.YELLOW);
-        timerLabel.setFont(timerLabel.getFont().deriveFont(16f));
+        modePicker = new JComboBox<>();
 
-        modeLabel.setForeground(Color.WHITE);
-        modeLabel.setFont(modeLabel.getFont().deriveFont(Font.BOLD, 18f));
+        // Get available modes and add them directly
+        Set<ModeTAG> availableModes = SimulationManager.getInstance().getVtrController().getAvailableModes();
+        for (ModeTAG mode : availableModes) {
+            modePicker.addItem(mode);
+        }
 
-        weightLabel.setForeground(Color.LIGHT_GRAY);
-        weightLabel.setFont(weightLabel.getFont().deriveFont(14f));
-
-        add(timerLabel);
-        add(modeLabel);
-        add(weightLabel);
+        modePicker.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ModeTAG selectedMode = (ModeTAG) modePicker.getSelectedItem();
+                SimulationManager.getInstance()
+                    .getVtrController()
+                    .setActiveModeWithCorrespondingDefaultSettings(selectedMode);
+            }
+        });
+        add(modePicker);
     }
-
-    // Expose setters so your VentilatorController can update these in real time:
-    public void setTimer(String t)   { timerLabel.setText(t); }
-    public void setMode(String m)    { modeLabel.setText(m); }
-    public void setWeight(String w)  { weightLabel.setText(w); }
 }

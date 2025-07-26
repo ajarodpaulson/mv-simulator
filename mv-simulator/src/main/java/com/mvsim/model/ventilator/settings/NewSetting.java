@@ -1,4 +1,4 @@
-package com.mvsim.model;
+package com.mvsim.model.ventilator.settings;
 
 public interface NewSetting {
 

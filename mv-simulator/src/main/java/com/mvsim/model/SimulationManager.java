@@ -12,9 +12,10 @@ import com.mvsim.model.lungsim.LungSim;
 import com.mvsim.model.lungsim.LungSimSetting;
 import com.mvsim.model.observer.Observable;
 import com.mvsim.model.observer.SimMgrObserver;
-import com.mvsim.model.ventilator.MostRecentTickData;
 import com.mvsim.model.ventilator.Ventilator;
 import com.mvsim.model.ventilator.VentilatorController;
+import com.mvsim.model.ventilator.metrics.MetricName;
+import com.mvsim.model.ventilator.metrics.MostRecentTickData;
 
 /**
  * Represents a manager for the lung simulator and mechanical ventilation
@@ -130,16 +131,16 @@ public class SimulationManager extends Observable implements ChangeListener {
 
     @Override
     public void notifyObservers() {
-        // Move the data collection work here, but run it on the EDT
         SwingUtilities.invokeLater(() -> {
-            updateMostRecentTickData(); // This is where you grab the latest tick data
+            updateMetrics();                                        
             for (SimMgrObserver o : observers) {
-                o.update(mostRecentTickData);
+                o.update(vtrController.getMetrics());
             }
         });
     }
 
-    private void updateMostRecentTickData() {
+    private void updateMetrics() {
         mostRecentTickData.update(this);
+        vtrController.updateMetrics();
     }
 }

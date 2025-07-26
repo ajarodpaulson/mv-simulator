@@ -6,15 +6,16 @@ import java.util.function.Function;
 import javax.swing.JPanel;
 
 import com.mvsim.model.Units;
-import com.mvsim.model.ventilator.MostRecentTickData;
+import com.mvsim.model.ventilator.metrics.Metrics;
+import com.mvsim.model.ventilator.metrics.MostRecentTickData;
 
 public class FlowWaveformPanel extends WaveformPanel {
     FlowWaveformPanel() {
-        super("Flowrate", Units.FLOWRATE.getNotation(), Color.GREEN, new Function<MostRecentTickData, Float>() {
+        super("Flowrate", Units.FLOWRATE.getNotation(), Color.GREEN, new Function<Metrics, Float>() {
 
             @Override
-            public Float apply(MostRecentTickData data) {
-                return data.getCurrentSystemFlowrate();
+            public Float apply(Metrics metrics) {
+                return metrics.getCurrentSystemFlowrate();
             }
         });
     }

@@ -2,6 +2,8 @@ package com.mvsim.ui.desktop;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Function;
 
 import javax.swing.JPanel;
@@ -16,14 +18,17 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import com.mvsim.model.observer.SimMgrObserver;
-import com.mvsim.model.ventilator.MostRecentTickData;
+import com.mvsim.model.ventilator.metrics.Metric;
+import com.mvsim.model.ventilator.metrics.MetricName;
+import com.mvsim.model.ventilator.metrics.Metrics;
+import com.mvsim.model.ventilator.metrics.MostRecentTickData;
 
 public abstract class WaveformPanel extends JPanel implements SimMgrObserver {
      private final XYSeries series;
-     private final Function<MostRecentTickData, Float> getSystemScalarMetric;
+     private final Function<Metrics, Float> getSystemScalarMetric;
 
     WaveformPanel(String scalar, String unitNotation, Color color,
-    Function<MostRecentTickData, Float> getSystemScalarMetric) {
+    Function<Metrics, Float> getSystemScalarMetric) {
         setLayout(new BorderLayout());
         this.getSystemScalarMetric = getSystemScalarMetric;
         series = new XYSeries(scalar);
@@ -50,7 +55,7 @@ public abstract class WaveformPanel extends JPanel implements SimMgrObserver {
     }
 
    @Override
-    public void update(MostRecentTickData data) {
-        series.add(data.getCurrentSystemTime(), getSystemScalarMetric.apply(data));
+    public void update(Metrics metrics) {
+        series.add(metrics.getCurrentSystemTime(), getSystemScalarMetric.apply(metrics));
     }
 }

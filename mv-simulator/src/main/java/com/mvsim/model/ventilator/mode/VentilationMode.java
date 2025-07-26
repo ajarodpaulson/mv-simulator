@@ -21,9 +21,9 @@ public abstract class VentilationMode<V extends ModeControlVariable> {
     /*
      * XXX: feel like these don't belong in this class.
      */
-    private int tick;
-    public int getTick() {
-        return tick;
+    private int tickCounter;
+    public int getTickCounter() {
+        return tickCounter;
     }
 
     private boolean isInInspiratoryPhase = true;
@@ -34,7 +34,7 @@ public abstract class VentilationMode<V extends ModeControlVariable> {
     }
 
     public int getTimeInPhaseInMS() {
-        return tick * TICK_PERIOD_IN_MS;
+        return tickCounter * TICK_PERIOD_IN_MS;
     }
 
     public void setIsInInspiratoryPhase(boolean isInInspiratoryPhase) {
@@ -52,11 +52,11 @@ public abstract class VentilationMode<V extends ModeControlVariable> {
         this.ts = targetingScheme;
         this.cv = controlVariable;
         this.settings = settings;
-        tick = 0;
+        tickCounter = 0;
     }
 
     private void resetTick() {
-        tick = 0;
+        tickCounter = 0;
     }
 
     public void tick() {
@@ -66,7 +66,7 @@ public abstract class VentilationMode<V extends ModeControlVariable> {
 
         vtr.notifyObservers();
         
-        tick++;
+        tickCounter++;
     }
 
     public Settings getSettings() {

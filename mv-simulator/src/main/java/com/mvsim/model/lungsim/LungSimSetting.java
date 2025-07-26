@@ -1,7 +1,7 @@
 package com.mvsim.model.lungsim;
 
-import com.mvsim.model.NewSetting;
 import com.mvsim.model.Units;
+import com.mvsim.model.ventilator.settings.NewSetting;
 
 /*
  * Why is this an enum?

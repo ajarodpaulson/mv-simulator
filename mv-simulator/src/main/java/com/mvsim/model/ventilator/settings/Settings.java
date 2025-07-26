@@ -4,8 +4,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.mvsim.model.Setting;
-
 /**
  * Represents the superclass of the settings for all ventilation modes.
  */

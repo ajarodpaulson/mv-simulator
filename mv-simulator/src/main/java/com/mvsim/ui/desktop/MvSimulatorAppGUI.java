@@ -67,7 +67,7 @@ public class MvSimulatorAppGUI extends JFrame implements WindowListener {
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
-        gbc.weightx = 0.6;
+        gbc.weightx = 0.8;
         gbc.weighty = 0.8;
         add(waveformsPanel, gbc);
         
@@ -76,7 +76,7 @@ public class MvSimulatorAppGUI extends JFrame implements WindowListener {
         gbc.gridy = 1; // Start at the top
         gbc.gridwidth = 1;
         gbc.gridheight = 1; // Spans both info and waveform rows
-        gbc.weightx = 0.3;
+        gbc.weightx = 0.1;
         gbc.weighty = 0.8; // Takes up info + waveform height (0.1 + 0.8)
         add(metricsPanel, gbc);
         

@@ -18,17 +18,17 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import com.mvsim.model.Units;
-import com.mvsim.model.ventilator.MostRecentTickData;
+import com.mvsim.model.ventilator.metrics.Metrics;
+import com.mvsim.model.ventilator.metrics.MostRecentTickData;
 
 public final class PressureWaveformPanel extends WaveformPanel {
     PressureWaveformPanel() {
-        super("Pressure", Units.PRESSURE.getNotation(), Color.YELLOW, new Function<MostRecentTickData, Float>() {
+        super("Pressure", Units.PRESSURE.getNotation(), Color.YELLOW, new Function<Metrics, Float>() {
 
             @Override
-            public Float apply(MostRecentTickData data) {
-                return data.getCurrentSystemPressure();
+            public Float apply(Metrics metrics) {
+                return metrics.getCurrentSystemPressure();
             }
-
         });
     }
 }
