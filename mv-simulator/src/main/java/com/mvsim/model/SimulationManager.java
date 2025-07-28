@@ -23,7 +23,7 @@ import com.mvsim.model.ventilator.metrics.MostRecentTickData;
  */
 public class SimulationManager extends Observable implements ChangeListener {
     private VentilatorController vtrController;
-    private final Ventilator vtr;
+    private Ventilator vtr;
     private LungSim lungSim;
     private static SimulationManager theManager;
     private Set<SimMgrObserver> observers;
@@ -36,6 +36,10 @@ public class SimulationManager extends Observable implements ChangeListener {
         this.vtrController = vtr.getController();
         this.observers = new HashSet<>();
         this.mostRecentTickData = new MostRecentTickData(this);
+    }
+
+    public void reset() {
+        theManager = new SimulationManager();
     }
 
     public void addObserver(SimMgrObserver o) {
@@ -59,12 +63,12 @@ public class SimulationManager extends Observable implements ChangeListener {
         return vtrController;
     }
 
-    public void setVtr(VentilatorController vtrController) {
-        this.vtrController = vtrController;
-    }
-
     public LungSim getLungSim() {
         return lungSim;
+    }
+
+    public void setLungSimSetting(LungSimSetting setting, float value) {
+        this.lungSim.getSettings().setSetting(setting, value);
     }
 
     /**

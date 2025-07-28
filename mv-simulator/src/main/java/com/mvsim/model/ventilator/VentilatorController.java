@@ -4,6 +4,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.mvsim.model.exception.ActiveModeNotSetException;
+import com.mvsim.model.exception.NoSuchVentilationSettingException;
 import com.mvsim.model.exception.PreconditionViolatedException;
 import com.mvsim.model.ventilator.metrics.Metric;
 import com.mvsim.model.ventilator.metrics.MetricName;
@@ -20,7 +21,7 @@ import com.mvsim.model.ventilator.settings.Settings;
  * user/simulation manager.
  */
 public class VentilatorController {
-    private Ventilator vtr;
+    private final Ventilator vtr;
     private Metrics metrics;
     private float systemVolumeChange = 0f;
 
@@ -126,7 +127,7 @@ public class VentilatorController {
         return VentilationMode.TICK_PERIOD_IN_MS;
     }
 
-    public void setModeSetting(String label, float value) {
+    public void setActiveModeSetting(String label, float value) throws NoSuchVentilationSettingException {
         vtr.getActiveMode().getSettings().setSetting(label, value);
     }
 

@@ -1,6 +1,7 @@
 package com.mvsim.model.ventilator.mode;
 
 import com.mvsim.model.ventilator.Ventilator;
+import com.mvsim.model.ventilator.settings.Setting;
 import com.mvsim.model.ventilator.settings.Settings;
 
 /**
@@ -80,6 +81,10 @@ public abstract class VentilationMode<V extends ModeControlVariable> {
     public float getTickPeriod() {
         return TICK_PERIOD_IN_MS;
     }
+
+	public Setting getSetting(String name) {
+		return settings.getSetting(name);
+	}
 
     // protected abstract boolean hasFullyConfiguredSettings(); // not needed for now because all setting strategies will have default values
 }

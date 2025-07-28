@@ -1,12 +1,12 @@
 package com.mvsim.model.lungsim;
 
 import com.mvsim.model.Units;
-import com.mvsim.model.ventilator.settings.NewSetting;
+import com.mvsim.model.ventilator.settings.SettingProperties;
 
 /*
  * Why is this an enum?
  */
-public enum LungSimSetting implements NewSetting {
+public enum LungSimSetting implements SettingProperties {
     COMPLIANCE("Compliance", Units.COMPLIANCE, 100f, 0f, 1000f, 1f),
     RESISTANCE("Resistance", Units.RESISTANCE, 1.0f, 0f, 100f, 0.1f);
 

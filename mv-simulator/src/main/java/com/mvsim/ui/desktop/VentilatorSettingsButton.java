@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import javax.swing.JSpinner;
 
 import com.mvsim.model.SimulationManager;
+import com.mvsim.model.exception.NoSuchVentilationSettingException;
 
 public class VentilatorSettingsButton extends SettingsButton {
 
@@ -15,8 +16,12 @@ public class VentilatorSettingsButton extends SettingsButton {
 
             @Override
             public void accept(JSpinner spinner) {
-                SimulationManager.getInstance().getVtrController().setModeSetting(label,
-                        ((Number) spinner.getValue()).floatValue());
+                try {
+                    SimulationManager.getInstance().getVtrController().setActiveModeSetting(label,
+                            ((Number) spinner.getValue()).floatValue());
+                } catch (NoSuchVentilationSettingException e) {
+                    System.out.println(e.getMessage());
+                }
             }
 
         }, label, value, min, max, stepSize);

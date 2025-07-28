@@ -23,7 +23,6 @@ public class CmvTest {
         vtr.getController()
                 .setActiveModeWithCorrespondingDefaultSettings(new ModeTAG(ControlVariableType.VOLUME_CONTROL,
                         BreathSequenceType.CONTINUOUS_MANDATORY_VENTILATION, TargetingSchemeType.SET_POINT));
-        vtr.getController().getActiveMode().setSettings(new VcCmvSetpointSettings());
         try {
             vtr.enableVentilation();
         } catch (ActiveModeNotSetException e) {

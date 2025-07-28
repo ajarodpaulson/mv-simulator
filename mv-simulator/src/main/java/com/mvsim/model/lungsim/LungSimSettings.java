@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.mvsim.model.ventilator.settings.NewSetting;
+import com.mvsim.model.ventilator.settings.SettingProperties;
 
 public class LungSimSettings implements Iterable<Entry<LungSimSetting, Number>> {
 
@@ -16,7 +16,7 @@ public class LungSimSettings implements Iterable<Entry<LungSimSetting, Number>> 
         settingsMap.put(LungSimSetting.RESISTANCE, LungSimSetting.RESISTANCE.getDefaultValue());
     }
 
-    public Number getSetting(NewSetting setting) {
+    public Number getSetting(SettingProperties setting) {
         return settingsMap.get(setting);
     }
 

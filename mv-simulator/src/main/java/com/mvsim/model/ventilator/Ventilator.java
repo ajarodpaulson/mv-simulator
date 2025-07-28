@@ -11,8 +11,12 @@ import com.mvsim.model.ventilator.hardware.Actuator;
 import com.mvsim.model.ventilator.hardware.ExpFlowSensor;
 import com.mvsim.model.ventilator.hardware.InspFlowSensor;
 import com.mvsim.model.ventilator.hardware.PressureSensor;
+import com.mvsim.model.ventilator.mode.BreathSequenceType;
+import com.mvsim.model.ventilator.mode.ControlVariable;
+import com.mvsim.model.ventilator.mode.ControlVariableType;
 import com.mvsim.model.ventilator.mode.ModeTAG;
 import com.mvsim.model.ventilator.mode.ModeTable;
+import com.mvsim.model.ventilator.mode.TargetingSchemeType;
 import com.mvsim.model.ventilator.mode.VentilationMode;
 import com.mvsim.model.ventilator.mode.VcCmvSetpoint;
 
@@ -29,8 +33,32 @@ public class Ventilator extends Observable {
     private PressureSensor pressureSensor;
     private Actuator actuator;
     private VentilationMode<?> activeMode;
-    private VentilatorController controller;
+    private final VentilatorController controller;
     private LungSim lungSim;
+    private ModeTable modeTable;
+    /*
+     * XXX: I also think it would be fine to make this volatile. We do not have
+     * multiple threads writing to this variable. The only thing we need to be
+     * concerned with is the the display thread does not cache a local copy of this
+     * variable. This might actually slow things down...?
+     */
+    private AtomicBoolean isVentilationEnabled;
+
+    public Ventilator() {
+        this.inspFlowSensor = new InspFlowSensor();
+        this.expFlowSensor = new ExpFlowSensor();
+        this.pressureSensor = new PressureSensor();
+        this.actuator = new Actuator(this);
+        this.modeTable = new ModeTable(this);
+        this.activeMode = modeTable.getMode(new ModeTAG(ControlVariableType.VOLUME_CONTROL,
+                BreathSequenceType.CONTINUOUS_MANDATORY_VENTILATION, TargetingSchemeType.SET_POINT)); // default mode
+        isVentilationEnabled = new AtomicBoolean(false);
+        this.controller = new VentilatorController(this);
+
+        this.addObserver(pressureSensor);
+        this.addObserver(inspFlowSensor);
+        this.addObserver(expFlowSensor);
+    }
 
     public VentilatorController getController() {
         return controller;
@@ -52,33 +80,8 @@ public class Ventilator extends Observable {
         this.lungSim = lungSim;
     }
 
-    private ModeTable modeTable;
-
-    /*
-     * XXX: I also think it would be fine to make this volatile. We do not have
-     * multiple threads writing to this variable. The only thing we need to be
-     * concerned with is the the display thread does not cache a local copy of this
-     * variable. This might actually slow things down...?
-     */
-    private AtomicBoolean isVentilationEnabled;
-
     public boolean getIsVentilationEnabled() {
         return isVentilationEnabled.get();
-    }
-
-    public Ventilator() {
-        this.inspFlowSensor = new InspFlowSensor();
-        this.expFlowSensor = new ExpFlowSensor();
-        this.pressureSensor = new PressureSensor();
-        this.actuator = new Actuator(this);
-        this.modeTable = new ModeTable(this);
-        this.activeMode = new VcCmvSetpoint(this); // default mode
-        isVentilationEnabled = new AtomicBoolean(false);
-        this.controller = new VentilatorController(this);
-
-        this.addObserver(pressureSensor);
-        this.addObserver(inspFlowSensor);
-        this.addObserver(expFlowSensor);
     }
 
     public VentilationMode<?> getActiveMode() {
@@ -145,12 +148,14 @@ public class Ventilator extends Observable {
 
     /**
      * Attempts to perform one control loop tick using the active ventilation mode.
-     * @throws IllegalStateException if active mode null or was called while ventilation disabled
+     * 
+     * @throws IllegalStateException if active mode null or was called while
+     *                               ventilation disabled
      */
     public void tick() {
         if (activeMode == null) {
             throw new IllegalStateException("Active mode not set.");
-        } 
+        }
         if (!isVentilationEnabled.get()) {
             throw new IllegalStateException("Ventilation is not enabled.");
         }

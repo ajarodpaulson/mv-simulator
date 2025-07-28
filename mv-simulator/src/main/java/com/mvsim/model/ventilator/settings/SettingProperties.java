@@ -1,6 +1,6 @@
 package com.mvsim.model.ventilator.settings;
 
-public interface NewSetting {
+public interface SettingProperties {
 
     Number getDefaultValue();
 
