@@ -7,7 +7,7 @@ import javax.swing.JPanel;
 
 import com.mvsim.model.Units;
 import com.mvsim.model.ventilator.metrics.Metrics;
-import com.mvsim.model.ventilator.metrics.MostRecentTickData;
+// import com.mvsim.model.ventilator.metrics.MostRecentTickData;
 
 public class FlowWaveformPanel extends WaveformPanel {
     FlowWaveformPanel() {

@@ -1,37 +1,37 @@
-package com.mvsim.model.ventilator.metrics;
+// package com.mvsim.model.ventilator.metrics;
 
-import com.mvsim.model.SimulationManager;
+// import com.mvsim.model.SimulationManager;
 
-public class MostRecentTickData {
-    private float currentSystemPressure;
-    private float currentSystemFlowrate; 
-    private float currentSystemVolume;
-    private float currentSystemTime;
+// public class MostRecentTickData {
+//     private float currentSystemPressure;
+//     private float currentSystemFlowrate; 
+//     private float currentSystemVolume;
+//     private float currentSystemTime;
 
-    public MostRecentTickData(SimulationManager simMgr) {
-        update(simMgr);
-    }
+//     public MostRecentTickData(SimulationManager simMgr) {
+//         update(simMgr);
+//     }
 
-    public void update(SimulationManager simMgr) {
-        this.currentSystemPressure = simMgr.getCurrentSystemPressure();
-        this.currentSystemFlowrate = simMgr.getCurrentSystemFlowrate();
-        this.currentSystemVolume = simMgr.getCurrentSystemVolumeChange();
-        this.currentSystemTime = (simMgr.getVtrController().getTickPeriodInMs() / 1000f) * simMgr.getVtrController().getActiveMode().getTickCounter();
-    }
+//     public void update(SimulationManager simMgr) {
+//         this.currentSystemPressure = simMgr.getCurrentSystemPressure();
+//         this.currentSystemFlowrate = simMgr.getCurrentSystemFlowrate();
+//         this.currentSystemVolume = simMgr.getCurrentSystemVolumeChange();
+//         this.currentSystemTime = (simMgr.getVtrController().getTickPeriodInMs() / 1000f) * simMgr.getVtrController().getActiveMode().getTickCounter();
+//     }
 
-    public float getCurrentSystemPressure() {
-        return currentSystemPressure;
-    }
+//     public float getCurrentSystemPressure() {
+//         return currentSystemPressure;
+//     }
 
-    public float getCurrentSystemFlowrate() {
-        return currentSystemFlowrate;
-    }
+//     public float getCurrentSystemFlowrate() {
+//         return currentSystemFlowrate;
+//     }
 
-    public float getCurrentSystemVolume() {
-        return currentSystemVolume;
-    }
+//     public float getCurrentSystemVolume() {
+//         return currentSystemVolume;
+//     }
 
-    public float getCurrentSystemTime() {
-        return currentSystemTime;
-    }
-}
+//     public float getCurrentSystemTime() {
+//         return currentSystemTime;
+//     }
+// }

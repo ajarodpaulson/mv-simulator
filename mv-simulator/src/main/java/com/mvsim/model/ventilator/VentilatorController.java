@@ -100,30 +100,6 @@ public class VentilatorController {
         return vtr.getIsVentilationEnabled();
     }
 
-    public float getCurrentSystemPressure() {
-        return vtr.getPressureSensor().getCurrentSystemPressure();
-    }
-
-    public float getCurrentSystemFlowrate() {
-        if (vtr.getActiveMode().getIsInInspiratoryPhase()) {
-            return vtr.getInspFlowSensor().getLatestInspiratoryFlowReading();
-        } else {
-            return vtr.getExpFlowSensor().getCurrentExpiratoryFlow();
-        }
-    }
-
-    public float getCurrentSystemVolumeChange() {
-        if (vtr.getActiveMode().getIsInInspiratoryPhase()) {
-            systemVolumeChange += vtr.getInspFlowSensor().getLatestInspiratoryFlowReading()
-                    * (VentilationMode.TICK_PERIOD_IN_MS / 1000f);
-            return systemVolumeChange;
-        } else {
-            systemVolumeChange -= vtr.getExpFlowSensor().getCurrentExpiratoryFlow()
-                    * (VentilationMode.TICK_PERIOD_IN_MS / 1000f);
-            return systemVolumeChange;
-        }
-    }
-
     public int getTickPeriodInMs() {
         return VentilationMode.TICK_PERIOD_IN_MS;
     }

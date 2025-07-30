@@ -15,7 +15,7 @@ import com.mvsim.model.observer.SimMgrObserver;
 import com.mvsim.model.ventilator.Ventilator;
 import com.mvsim.model.ventilator.VentilatorController;
 import com.mvsim.model.ventilator.metrics.MetricName;
-import com.mvsim.model.ventilator.metrics.MostRecentTickData;
+// import com.mvsim.model.ventilator.metrics.MostRecentTickData;
 
 /**
  * Represents a manager for the lung simulator and mechanical ventilation
@@ -27,7 +27,7 @@ public class SimulationManager extends Observable implements ChangeListener {
     private LungSim lungSim;
     private static SimulationManager theManager;
     private Set<SimMgrObserver> observers;
-    private final MostRecentTickData mostRecentTickData;
+    // private final MostRecentTickData mostRecentTickData;
 
     private SimulationManager() {
         this.vtr = new Ventilator();
@@ -35,7 +35,7 @@ public class SimulationManager extends Observable implements ChangeListener {
         vtr.setLungSim(lungSim);
         this.vtrController = vtr.getController();
         this.observers = new HashSet<>();
-        this.mostRecentTickData = new MostRecentTickData(this);
+        // this.mostRecentTickData = new MostRecentTickData(this);
     }
 
     public void reset() {
@@ -113,15 +113,15 @@ public class SimulationManager extends Observable implements ChangeListener {
     }
 
     public float getCurrentSystemPressure() {
-        return vtrController.getCurrentSystemPressure();
+        return vtrController.getMetrics().getCurrentSystemPressure();
     }
 
     public float getCurrentSystemFlowrate() {
-        return vtrController.getCurrentSystemFlowrate();
+        return vtrController.getMetrics().getCurrentSystemFlowrate();
     }
 
     public float getCurrentSystemVolumeChange() {
-        return vtrController.getCurrentSystemVolumeChange();
+        return vtrController.getMetrics().getCurrentSystemVolumeChange();
     }
 
     public void stopSimulation() {
@@ -144,7 +144,7 @@ public class SimulationManager extends Observable implements ChangeListener {
     }
 
     private void updateMetrics() {
-        mostRecentTickData.update(this);
+        // mostRecentTickData.update(this);
         vtrController.updateMetrics();
     }
 }
