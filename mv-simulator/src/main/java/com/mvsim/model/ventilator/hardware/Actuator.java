@@ -37,4 +37,8 @@ public class Actuator {
 	public float getLastVolumeBolusDelivered() {
 		return lastVolumeBolusDelivered;
 	}
+
+    public void instantlyPressurize(float peep) {
+        vtr.getLungSim().instantlyPressurize(peep);
+    }
 }

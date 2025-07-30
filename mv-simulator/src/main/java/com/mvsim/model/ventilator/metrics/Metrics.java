@@ -52,7 +52,7 @@ public class Metrics {
     }
 
     private float currentSystemFlowrate; 
-    private float currentSystemVolumeChange;
+    private float currentSystemVolumeChange = 0.0f;
     private float currentSystemTime;
 
     public float getCurrentSystemTime() {
@@ -149,22 +149,25 @@ public class Metrics {
         }
     }
 
-    public float getCurrentSystemVolumeChange() {
+    public void updateCurrentSystemVolumeChange() {
+        float cf = 1000f / 60f;
         if (vtr.getActiveMode().getIsInInspiratoryPhase()) {
-            currentSystemVolumeChange += vtr.getInspFlowSensor().getLatestInspiratoryFlowReading()
+            currentSystemVolumeChange += (vtr.getInspFlowSensor().getLatestInspiratoryFlowReading() * cf)
                     * (VentilationMode.TICK_PERIOD_IN_MS / 1000f);
-            return currentSystemVolumeChange;
         } else {
-            currentSystemVolumeChange -= vtr.getExpFlowSensor().getCurrentExpiratoryFlow()
+            currentSystemVolumeChange += (vtr.getExpFlowSensor().getCurrentExpiratoryFlow() * cf)
                     * (VentilationMode.TICK_PERIOD_IN_MS / 1000f);
-            return currentSystemVolumeChange;
         }
+    }
+    
+    public float getCurrentSystemVolumeChange() {
+        return currentSystemVolumeChange;
     }
 
     public void update() {
         this.currentSystemPressure = vtr.getPressureSensor().getCurrentSystemPressure();
         this.currentSystemFlowrate = getCurrentSystemFlowrate();
-        this.currentSystemVolumeChange = getCurrentSystemVolumeChange();
+        updateCurrentSystemVolumeChange();
         this.currentSystemTime = (vtr.getActiveMode().getTickPeriod() / 1000f) * vtr.getActiveMode().getTickCounter();
         updateMetricsMap();
         wasLastBreathPhaseInspiratory = vtr.getActiveMode().getIsInInspiratoryPhase();

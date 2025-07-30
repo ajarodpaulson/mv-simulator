@@ -18,6 +18,7 @@ import com.mvsim.model.ventilator.mode.ModeTAG;
 import com.mvsim.model.ventilator.mode.ModeTable;
 import com.mvsim.model.ventilator.mode.TargetingSchemeType;
 import com.mvsim.model.ventilator.mode.VentilationMode;
+import com.mvsim.model.ventilator.settings.Peep;
 import com.mvsim.model.ventilator.mode.VcCmvSetpoint;
 
 /**
@@ -100,11 +101,15 @@ public class Ventilator extends Observable {
     }
 
     /**
-     * Enables ventilation which allows ventilation to eventually be "started" by
-     * calling VentilationMode.tick(). Checks to ensure that there is an active
-     * mode. If the ventilator is already ventilating, do nothing.
+     * Enables ventilation checks to ensure there is an active mode and pressurizes
+     * the system with the set PEEP. If the ventilator is already ventilating, do
+     * nothing.
      * 
      * @throws ActiveModeNotSetException
+     */
+    /*
+     * XXX: seems kind of pointless now that you are instantiating a ventilator with
+     * a default active mode
      */
     public void enableVentilation() throws ActiveModeNotSetException {
         if (getIsVentilationEnabled()) {
@@ -113,8 +118,10 @@ public class Ventilator extends Observable {
         if (activeMode == null) {
             throw new ActiveModeNotSetException();
         }
-
         isVentilationEnabled.set(true);
+        actuator.instantlyPressurize(activeMode.getSetting(Peep.NAME).getValue().floatValue());
+
+        notifyObservers();
     }
 
     /**

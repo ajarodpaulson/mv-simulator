@@ -8,6 +8,10 @@ public class ExpFlowSensor implements VentilatorObserver {
 
     private float currentExpiratoryFlow = 0;
 
+    /**
+     * 
+     * @return The latest expiratory flow in Units.FLOWRATE
+     */
     public float getCurrentExpiratoryFlow() {
         return currentExpiratoryFlow;
     }
@@ -17,7 +21,7 @@ public class ExpFlowSensor implements VentilatorObserver {
         if (vtr.getController().getActiveMode().getIsInInspiratoryPhase()) {
             currentExpiratoryFlow = 0;
         } else {
-            currentExpiratoryFlow = vtr.getLungSim().getVolumeChange() / (VentilationMode.TICK_PERIOD_IN_MS / 1000f);
+            currentExpiratoryFlow = -1 * (((vtr.getLungSim().getVolumeChangeInMls() / 1000f) / (VentilationMode.TICK_PERIOD_IN_MS / 1000f)) * 60);
         }
     }
     

@@ -1,5 +1,6 @@
 package com.mvsim.model.lungsim;
 
+import com.mvsim.model.Utilities;
 import com.mvsim.model.ventilator.mode.VentilationMode;
 
 /**
@@ -20,23 +21,24 @@ public class LungSim {
     private float currentVolumeInLung = 0.0f;
     private float currentStaticPressureInLung = 0.0f;
     private float currentDynamicPressureInLung = 0.0f;
-    private float prevVtrPressure = Float.MIN_VALUE;
+    private float prevTargetPressure = Float.MIN_VALUE;
     private float currentPressureChangePerTick = 0;
-    private float volumeChange;
+    private float volumeChangeInMls;
 
-    private boolean pressureAndVolumeInLungAreSame() {
-        return (currentStaticPressureInLung >= currentVolumeInLung / compliance - TOL ||  currentStaticPressureInLung <= currentVolumeInLung / compliance + TOL);
+    private boolean pressureAbovePeepAndVolumeInLungAreCorresponding() {
+        return (currentStaticPressureInLung >= currentVolumeInLung / compliance - TOL
+                || currentStaticPressureInLung <= currentVolumeInLung / compliance + TOL);
     }
 
-    public float getVolumeChange() {
-        return volumeChange;
+    public float getVolumeChangeInMls() {
+        return volumeChangeInMls;
     }
 
-    public void setCurrentDynamicPressureInLung(float flowRate) {
-        currentDynamicPressureInLung = currentStaticPressureInLung + flowRate * (resistance / 1000f);
+    public void setCurrentDynamicPressureInLung(float flowrateInLPerS) {
+        currentDynamicPressureInLung = currentStaticPressureInLung + flowrateInLPerS * (resistance);
     }
 
-     public float getCurrentDynamicPressureInLung() {
+    public float getCurrentDynamicPressureInLung() {
         return currentDynamicPressureInLung;
     }
 
@@ -56,14 +58,15 @@ public class LungSim {
      * pressure change per tick. Otherwise, calculate the pressure change using the
      * time constant and assuming that full equilibration takes 5 time constants.
      * 
-     * @param currentVtrPressure
+     * @param currentTargetPressure
      * @return The pressure change per tick
      */
-    protected float getPressureChangePerTick(float currentVtrPressure) {
-        if (currentVtrPressure == prevVtrPressure) {
+    protected float getPressureChangePerTick(float currentTargetPressure) {
+        if (Utilities.equalWithinTolerance(currentTargetPressure, prevTargetPressure)) {
             return currentPressureChangePerTick;
         } else {
-            currentPressureChangePerTick = Math.abs(currentStaticPressureInLung - currentVtrPressure)
+            prevTargetPressure = currentTargetPressure;
+            currentPressureChangePerTick = Math.abs(currentStaticPressureInLung - currentTargetPressure)
                     * ((VentilationMode.TICK_PERIOD_IN_MS / 1000f) / (5 * getTimeConstant()));
             return currentPressureChangePerTick;
         }
@@ -90,16 +93,16 @@ public class LungSim {
      * @param volumeToAdd Volume in mL
      */
     public void addVolume(float volumeToAdd) {
-        assert pressureAndVolumeInLungAreSame();
+        assert pressureAbovePeepAndVolumeInLungAreCorresponding();
         currentVolumeInLung += volumeToAdd;
         updateCurrentPressure(volumeToAdd);
-        assert pressureAndVolumeInLungAreSame();
+        assert pressureAbovePeepAndVolumeInLungAreCorresponding();
     }
 
     private void updateCurrentPressure(float volumeToAdd) {
-        currentStaticPressureInLung = currentVolumeInLung / compliance;
-        setCurrentDynamicPressureInLung(volumeToAdd / (VentilationMode.TICK_PERIOD_IN_MS / 1000f));
-        assert pressureAndVolumeInLungAreSame();
+        currentStaticPressureInLung += volumeToAdd / compliance;
+        setCurrentDynamicPressureInLung((volumeToAdd / 1000f) / (VentilationMode.TICK_PERIOD_IN_MS / 1000f));
+        assert pressureAbovePeepAndVolumeInLungAreCorresponding();
     }
 
     /**
@@ -112,30 +115,33 @@ public class LungSim {
     }
 
     /**
-     * If pressure is the same do nothing. Otherwise, adjust the pressure in the
-     * lung using getPressureChangePerTick()
+     * This method will adjust the pressure in the lung using
+     * getPressureChangePerTick() if the supplied pressure is different from that in
+     * the lung, otherwise, the method does nothing.
      * 
-     * @param vtrPressure Pressure in cmH20
+     * @param targetPressure Ventilator pressure in cmH20
      */
-    public void equilibratePressure(float vtrPressure) {
-        assert pressureAndVolumeInLungAreSame();
-        if (vtrPressure == currentStaticPressureInLung) { // XXX: add some tolerance here?
+    public void equilibratePressure(float targetPressure) {
+        assert pressureAbovePeepAndVolumeInLungAreCorresponding();
+        if (Utilities.equalWithinTolerance(targetPressure, currentStaticPressureInLung)) { 
+            volumeChangeInMls = 0f;
+            currentDynamicPressureInLung = currentStaticPressureInLung; // since there would be no further flow at this point
             return;
-        } else if (vtrPressure > currentStaticPressureInLung) {
-            currentStaticPressureInLung += getPressureChangePerTick(vtrPressure);
+        } else if (targetPressure > currentStaticPressureInLung) {
+            currentStaticPressureInLung += getPressureChangePerTick(targetPressure);
         } else {
-            currentStaticPressureInLung -= getPressureChangePerTick(vtrPressure);
+            currentStaticPressureInLung -= getPressureChangePerTick(targetPressure);
         }
         updateCurrentVolume();
-        setCurrentDynamicPressureInLung(volumeChange / (VentilationMode.TICK_PERIOD_IN_MS / 1000f));
-        assert pressureAndVolumeInLungAreSame();
+        setCurrentDynamicPressureInLung((volumeChangeInMls / 1000f) / (VentilationMode.TICK_PERIOD_IN_MS / 1000f));
+        assert pressureAbovePeepAndVolumeInLungAreCorresponding();
     }
 
     private void updateCurrentVolume() {
         float newVolume = currentStaticPressureInLung * compliance;
-        this.volumeChange = Math.abs(newVolume - currentVolumeInLung);
+        this.volumeChangeInMls = Math.abs(newVolume - currentVolumeInLung);
         currentVolumeInLung = newVolume;
-        assert pressureAndVolumeInLungAreSame();
+        assert pressureAbovePeepAndVolumeInLungAreCorresponding();
     }
 
     /**
@@ -149,7 +155,7 @@ public class LungSim {
 
     public void setSetting(LungSimSetting name, Number value) {
         lungSimSettings.setSetting(name, value);
-        
+
         // Update cached values XXX do I want to get rid of this later?
         switch (name) {
             case COMPLIANCE:
@@ -159,5 +165,21 @@ public class LungSim {
                 this.resistance = value.floatValue();
                 break;
         }
+    }
+
+    /**
+     * A hack for adding PEEP to the lung once the ventilator is first started.
+     * "Instantaneously" increases the pressure in the lung to that supplied.
+     * 
+     * @param peep the set PEEP from the active mode
+     */
+    /*
+     * When peep is decreased, this may/will cause an issue as adding PEEP did not
+     * increase the lung volume
+     */
+    public void instantlyPressurize(float peep) {
+        currentStaticPressureInLung += peep;
+        currentDynamicPressureInLung += peep;
+        updateCurrentVolume();
     }
 }

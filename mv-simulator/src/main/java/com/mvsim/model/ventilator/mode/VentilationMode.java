@@ -60,6 +60,7 @@ public abstract class VentilationMode<V extends ModeControlVariable> {
         tickCounter = 0;
     }
 
+
     public void tick() {
         seq.determinePhase();
         ts.updateTarget();

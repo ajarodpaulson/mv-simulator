@@ -71,6 +71,7 @@ public class VentilatorController {
      */
     public void enableVentilation() throws ActiveModeNotSetException {
         vtr.enableVentilation();
+        metrics.update();
     }
 
     /**
