@@ -38,20 +38,22 @@ public class Metrics {
         metricsMap.put(MetricName.MEAN_PEEP, new Metric(getMeanPeep(), Units.PRESSURE));
         metricsMap.put(MetricName.MEAN_RESP_RATE, new Metric(getMeanRespRate(), Units.RESP_RATE));
         metricsMap.put(MetricName.EXHALED_MINUTE_VOLUME, new Metric(getMinuteVolume(), Units.FLOWRATE));
-        metricsMap.put(MetricName.MEASURED_INHALED_TIDAL_VOLUME, new Metric(getMeasuredInhaledTidalVolume(), Units.VOLUME));
-        metricsMap.put(MetricName.MEASURED_EXHALED_TIDAL_VOLUME, new Metric(getMeasuredExhaledTidalVolume(), Units.VOLUME));
+        metricsMap.put(MetricName.MEASURED_INHALED_TIDAL_VOLUME,
+                new Metric(getMeasuredInhaledTidalVolume(), Units.VOLUME));
+        metricsMap.put(MetricName.MEASURED_EXHALED_TIDAL_VOLUME,
+                new Metric(getMeasuredExhaledTidalVolume(), Units.VOLUME));
         metricsMap.put(MetricName.DYNAMIC_COMPLIANCE, new Metric(getDynamicCompliance(), Units.COMPLIANCE));
     }
 
     public Set<Entry<MetricName, Metric>> getAllMetrics() {
         return metricsMap.entrySet();
     }
-     
+
     public float getCurrentSystemPressure() {
         return currentSystemPressure;
     }
 
-    private float currentSystemFlowrate; 
+    private float currentSystemFlowrate;
     private float currentSystemVolumeChange = 0.0f;
     private float currentSystemTime;
 
@@ -82,12 +84,13 @@ public class Metrics {
      *         most recent breath cycle
      */
     public float getMeanPressure() {
-        if (vtr.getActiveMode().getIsInInspiratoryPhase()) {
-            if (!wasLastBreathPhaseInspiratory) {
-                meanPressure = nextMeanPressure;
-            }
+        if (vtr.getActiveMode().getIsInInspiratoryPhase() && !wasLastBreathPhaseInspiratory) {
+            meanPressure = nextMeanPressure;
+            nextMeanPressure = vtr.getPressureSensor().getCurrentSystemPressure()
+                    * vtr.getActiveMode().getTickPeriod();
         } else {
-            nextMeanPressure += (vtr.getPressureSensor().getCurrentSystemPressure() * vtr.getActiveMode().getTickPeriod());
+            nextMeanPressure += (vtr.getPressureSensor().getCurrentSystemPressure()
+                    * vtr.getActiveMode().getTickPeriod());
         }
         return meanPressure;
     }
@@ -159,7 +162,7 @@ public class Metrics {
                     * (VentilationMode.TICK_PERIOD_IN_MS / 1000f);
         }
     }
-    
+
     public float getCurrentSystemVolumeChange() {
         return currentSystemVolumeChange;
     }

@@ -29,6 +29,16 @@ public abstract class WaveformPanel extends JPanel implements SimMgrObserver {
     private double lastSystemTime = -1.0;
     private double displayTime = 0.0;
 
+    /**
+     * Constructor for a scalar waveform panel.
+     * 
+     * @param scalar                name of the scalar for the implementing subclass
+     * @param unitNotation          appropriate scalar units for the implementing
+     *                              subclass
+     * @param color                 desired color for the trendline
+     * @param getSystemScalarMetric appropriate scalar data for the implementing
+     *                              subclass
+     */
     WaveformPanel(String scalar, String unitNotation, Color color,
             Function<Metrics, Float> getSystemScalarMetric) {
         setLayout(new BorderLayout());
@@ -79,6 +89,8 @@ public abstract class WaveformPanel extends JPanel implements SimMgrObserver {
     @Override
     public void update(Metrics metrics) {
         double currentSystemTime = metrics.getCurrentSystemTime();
+        System.out.println(metrics.getCurrentSystemTime()); // XXX probably not doing what you want it to do... tick is
+                                                            // being reset with each phase change
 
         // Detect if simulation was restarted by checking for a large time gap
         if (lastSystemTime > 0 && (currentSystemTime - lastSystemTime) > 1.0) {
@@ -86,7 +98,8 @@ public abstract class WaveformPanel extends JPanel implements SimMgrObserver {
         }
         lastSystemTime = currentSystemTime;
 
-        // Use a fixed time increment for a smooth scroll, based on the simulation tick rate
+        // Use a fixed time increment for a smooth scroll, based on the simulation tick
+        // rate
         double timeIncrement = SimulationManager.getInstance().getVtrController().getTickPeriodInMs() / 1000.0;
         displayTime += timeIncrement;
 
