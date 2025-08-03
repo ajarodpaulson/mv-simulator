@@ -4,8 +4,8 @@ import com.mvsim.model.Units;
 
 public class Metric {
 
-    float value;
-    Units units;
+    private float value;
+    private Units units;
 
     Metric(float value, Units units) {
         this.value = value;
@@ -18,5 +18,9 @@ public class Metric {
 
     public Units getUnits() {
         return units;
+    }
+
+    public void setValue(float value) {
+        this.value = value;
     }
 }

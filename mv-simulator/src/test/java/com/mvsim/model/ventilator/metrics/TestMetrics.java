@@ -1,5 +1,6 @@
 package com.mvsim.model.ventilator.metrics;
 
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,6 +35,51 @@ public class TestMetrics {
 
     }
 
-    // @Test
-    // public void testGetPeakPressure
+    @Test
+    public void testUpdatePeakPressure() {
+        assertEquals(0f, controller.getMetric(MetricName.PEAK_PRESSURE).getValue());
+
+        while (controller.getActiveMode().getIsInInspiratoryPhase()) {
+            assertEquals(0f, controller.getMetric(MetricName.PEAK_PRESSURE).getValue()); 
+            controller.tick();
+        }
+
+        while (!controller.getActiveMode().getIsInInspiratoryPhase()) {
+            assertEquals(10.5f, controller.getMetric(MetricName.PEAK_PRESSURE).getValue()); 
+            controller.tick();
+        }
+
+        assertEquals(10.5f, controller.getMetric(MetricName.PEAK_PRESSURE).getValue());
+    }
+
+    @Test
+    public void testUpdateMeanPressure() {
+        assertEquals(0f, controller.getMetric(MetricName.MEAN_PRESSURE).getValue());
+
+        while (controller.getActiveMode().getIsInInspiratoryPhase()) {
+            assertEquals(0f, controller.getMetric(MetricName.MEAN_PRESSURE).getValue()); 
+            controller.tick();
+        }
+
+        while (!controller.getActiveMode().getIsInInspiratoryPhase()) {
+            assertEquals(0f, controller.getMetric(MetricName.MEAN_PRESSURE).getValue()); 
+            controller.tick();
+        }
+
+        // ensure MAP is between PEEP and PIP for 20 breaths
+        for (int i=0; i<20; i++) {
+            while (controller.getActiveMode().getIsInInspiratoryPhase()) {
+            System.out.println(controller.getMetric(MetricName.MEAN_PRESSURE).getValue());
+            assertTrue(controller.getMetric(MetricName.MEAN_PRESSURE).getValue() >= 5.0f);
+            assertTrue(controller.getMetric(MetricName.MEAN_PRESSURE).getValue() <= 10.5f);
+            controller.tick();
+        }
+
+        while (!controller.getActiveMode().getIsInInspiratoryPhase()) {
+            assertTrue(controller.getMetric(MetricName.MEAN_PRESSURE).getValue() >= 5.0f);
+            assertTrue(controller.getMetric(MetricName.MEAN_PRESSURE).getValue() <= 10.5f);
+            controller.tick();
+        }
+        }
+    }
 }

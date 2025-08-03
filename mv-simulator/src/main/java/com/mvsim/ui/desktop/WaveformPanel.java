@@ -89,8 +89,6 @@ public abstract class WaveformPanel extends JPanel implements SimMgrObserver {
     @Override
     public void update(Metrics metrics) {
         double currentSystemTime = metrics.getCurrentSystemTime();
-        System.out.println(metrics.getCurrentSystemTime()); // XXX probably not doing what you want it to do... tick is
-                                                            // being reset with each phase change
 
         // Detect if simulation was restarted by checking for a large time gap
         if (lastSystemTime > 0 && (currentSystemTime - lastSystemTime) > 1.0) {

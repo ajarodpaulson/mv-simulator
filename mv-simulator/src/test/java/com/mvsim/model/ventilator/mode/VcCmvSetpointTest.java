@@ -41,7 +41,7 @@ public class VcCmvSetpointTest {
 
     @Test
     public void testConstructor() {
-        assertEquals(0, controller.getActiveMode().getTickCounter());
+        assertEquals(0, controller.getActiveMode().getTicksInCurrentBreathPhase());
         assertEquals(0, controller.getActiveMode().getTimeInPhaseInMS());
         assertTrue(controller.getActiveMode().getIsInInspiratoryPhase());
     }
@@ -139,9 +139,13 @@ public class VcCmvSetpointTest {
         // volume
         assertEquals(0f, controller.getMetrics().getCurrentSystemVolumeChange(), TestConstants.TOL);
 
+        assertEquals(0, controller.getActiveMode().getTicksInPreviousBreathCycle());
+
         controller.tick();
 
         assertTrue(controller.getActiveMode().getIsInInspiratoryPhase());
+
+        assertEquals(60, controller.getActiveMode().getTicksInPreviousBreathCycle());
 
         assertEquals(5.75f, controller.getMetrics().getCurrentSystemPressure(), TestConstants.TOL);
         assertEquals(30f, controller.getMetrics().getCurrentSystemFlowrate(), TestConstants.TOL); 

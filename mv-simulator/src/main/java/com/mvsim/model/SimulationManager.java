@@ -144,7 +144,6 @@ public class SimulationManager extends Observable implements ChangeListener {
     }
 
     private void updateMetrics() {
-        // mostRecentTickData.update(this);
         vtrController.updateMetrics();
     }
 }

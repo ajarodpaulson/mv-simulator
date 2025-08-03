@@ -27,13 +27,17 @@ public class VentilatorController {
 
     public VentilatorController(Ventilator vtr) {
         this.vtr = vtr;
-        this.metrics = new Metrics(vtr);
+        this.metrics = new Metrics(vtr, this);
     }
 
     // XXX: code smell? should the controller be responsible for updating the
     // metrics? should i be caching metrics at all?
     public Metrics getMetrics() {
         return metrics;
+    }
+
+    public Metric getMetric(MetricName metricName) {
+        return getMetrics().getMetric(metricName);
     }
 
     /**
@@ -61,6 +65,18 @@ public class VentilatorController {
 
     public VentilationMode<?> getActiveMode() {
         return vtr.getActiveMode();
+    }
+
+    /**
+     * @return The elapsed time since ventilation was started. Resets to 0 when the
+     *         ventilator is paused/stopped.
+     */
+    public float getVentilationTimeForActiveMode() {
+        return vtr.getTicksInActiveMode() * (vtr.getActiveMode().getTickPeriod() / 1000f);
+    }
+
+    public float getTimeInPreviousBreathCycle() {
+        return vtr.getActiveMode().getTicksInPreviousBreathCycle() * (vtr.getActiveMode().getTickPeriod() / 1000f);
     }
 
     /**

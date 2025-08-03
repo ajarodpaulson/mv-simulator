@@ -22,27 +22,39 @@ public abstract class VentilationMode<V extends ModeControlVariable> {
     /*
      * XXX: feel like these don't belong in this class.
      */
-    private int tickCounter;
-    public int getTickCounter() {
-        return tickCounter;
+    private int ticksInCurrentBreathPhase;
+    private int ticksInCurrentBreathCycle = 0;
+    private int ticksInPreviousBreathCycle;
+    private boolean isInInspiratoryPhase = true;
+    private boolean previousBreathPhaseWasExpiration = true;
+    public static final int TICK_PERIOD_IN_MS = 50;
+
+    public int getTicksInPreviousBreathCycle() {
+        return ticksInPreviousBreathCycle;
     }
 
-    private boolean isInInspiratoryPhase = true;
-    public static final int TICK_PERIOD_IN_MS = 50;
+    public int getTicksInCurrentBreathPhase() {
+        return ticksInCurrentBreathPhase;
+    }
 
     public boolean getIsInInspiratoryPhase() {
         return isInInspiratoryPhase;
     }
 
     public int getTimeInPhaseInMS() {
-        return tickCounter * TICK_PERIOD_IN_MS;
+        return ticksInCurrentBreathPhase * TICK_PERIOD_IN_MS;
     }
 
-    public void setIsInInspiratoryPhase(boolean isInInspiratoryPhase) {
-        if (this.getIsInInspiratoryPhase() == isInInspiratoryPhase) {
+    public void setIsInInspiratoryPhase(boolean isNextPhaseInspiratoryPhase) {
+        if (this.isInInspiratoryPhase == isNextPhaseInspiratoryPhase) {
             return;
         }
-        this.isInInspiratoryPhase = isInInspiratoryPhase;
+        if (!this.isInInspiratoryPhase && isNextPhaseInspiratoryPhase) {
+            ticksInPreviousBreathCycle = ticksInCurrentBreathCycle;
+            ticksInCurrentBreathCycle = 0;
+        }
+
+        this.isInInspiratoryPhase = isNextPhaseInspiratoryPhase;
         resetTick();
     }
 
@@ -53,13 +65,12 @@ public abstract class VentilationMode<V extends ModeControlVariable> {
         this.ts = targetingScheme;
         this.cv = controlVariable;
         this.settings = settings;
-        tickCounter = 0;
+        ticksInCurrentBreathPhase = 0;
     }
 
     private void resetTick() {
-        tickCounter = 0;
+        ticksInCurrentBreathPhase = 0;
     }
-
 
     public void tick() {
         seq.determinePhase();
@@ -67,8 +78,9 @@ public abstract class VentilationMode<V extends ModeControlVariable> {
         cv.actuate();
 
         vtr.notifyObservers();
-        
-        tickCounter++;
+
+        ticksInCurrentBreathPhase++;
+        ticksInCurrentBreathCycle++;
     }
 
     public Settings getSettings() {
@@ -83,11 +95,12 @@ public abstract class VentilationMode<V extends ModeControlVariable> {
         return TICK_PERIOD_IN_MS;
     }
 
-	public Setting getSetting(String name) {
-		return settings.getSetting(name);
-	}
+    public Setting getSetting(String name) {
+        return settings.getSetting(name);
+    }
 
-    // protected abstract boolean hasFullyConfiguredSettings(); // not needed for now because all setting strategies will have default values
+    // protected abstract boolean hasFullyConfiguredSettings(); // not needed for
+    // now because all setting strategies will have default values
 }
 
 // InitCycleBehaviour initCycleBehaviour;

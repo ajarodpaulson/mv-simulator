@@ -19,7 +19,6 @@ import com.mvsim.model.ventilator.mode.ModeTable;
 import com.mvsim.model.ventilator.mode.TargetingSchemeType;
 import com.mvsim.model.ventilator.mode.VentilationMode;
 import com.mvsim.model.ventilator.settings.Peep;
-import com.mvsim.model.ventilator.mode.VcCmvSetpoint;
 
 /**
  * Represents a ventilator that can have a single active mode and a single lung
@@ -37,6 +36,8 @@ public class Ventilator extends Observable {
     private final VentilatorController controller;
     private LungSim lungSim;
     private ModeTable modeTable;
+    private int ticksInActiveMode = 0;
+
     /*
      * XXX: I also think it would be fine to make this volatile. We do not have
      * multiple threads writing to this variable. The only thing we need to be
@@ -131,6 +132,7 @@ public class Ventilator extends Observable {
      */
     public void disableVentilation() {
         isVentilationEnabled.set(false);
+        ticksInActiveMode = 0;
     }
 
     public Set<ModeTAG> getAvailableModes() {
@@ -167,6 +169,11 @@ public class Ventilator extends Observable {
             throw new IllegalStateException("Ventilation is not enabled.");
         }
         activeMode.tick();
+        ticksInActiveMode++;
+    }
+
+    public int getTicksInActiveMode() {
+        return ticksInActiveMode;
     }
 
 }
