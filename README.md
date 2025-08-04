@@ -1,6 +1,6 @@
 # Mechanical Ventilation Simulator
-
 This application simulates a setup involving a test lung and mechanical ventilator (MV). Users can apply basic parameters to the lung and MV models and observe how this impacts basic ventilation metrics.
+<img width="2032" height="1167" alt="Screenshot 2025-08-04 at 12 38 49 PM" src="https://github.com/user-attachments/assets/55c3c1ce-8a8c-4707-9628-5a0aaf5137b7" />
 
 ## Who might use this application?
 Learners of respiratory physiology.
