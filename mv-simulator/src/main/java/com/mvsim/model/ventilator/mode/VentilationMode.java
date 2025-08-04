@@ -26,11 +26,16 @@ public abstract class VentilationMode<V extends ModeControlVariable> {
     private int ticksInCurrentBreathCycle = 0;
     private int ticksInPreviousBreathCycle;
     private boolean isInInspiratoryPhase = true;
-    private boolean previousBreathPhaseWasExpiration = true;
+    private int ticksInPreviousExpPhase;
+
     public static final int TICK_PERIOD_IN_MS = 50;
 
     public int getTicksInPreviousBreathCycle() {
         return ticksInPreviousBreathCycle;
+    }
+
+    public int getTicksInPreviousExpPhase() {
+        return ticksInPreviousExpPhase;
     }
 
     public int getTicksInCurrentBreathPhase() {
@@ -49,7 +54,9 @@ public abstract class VentilationMode<V extends ModeControlVariable> {
         if (this.isInInspiratoryPhase == isNextPhaseInspiratoryPhase) {
             return;
         }
+
         if (!this.isInInspiratoryPhase && isNextPhaseInspiratoryPhase) {
+            ticksInPreviousExpPhase = ticksInCurrentBreathPhase;
             ticksInPreviousBreathCycle = ticksInCurrentBreathCycle;
             ticksInCurrentBreathCycle = 0;
         }
@@ -81,6 +88,14 @@ public abstract class VentilationMode<V extends ModeControlVariable> {
 
         ticksInCurrentBreathPhase++;
         ticksInCurrentBreathCycle++;
+    }
+
+    public boolean getDidPhaseTransitionFromInspToExp() {
+        return seq.getDidPhaseTransitionFromInspToExp();
+    }
+
+    public boolean getDidPhaseTransitionFromExpToInsp() {
+        return seq.getDidPhaseTransitionFromExpToInsp();
     }
 
     public Settings getSettings() {

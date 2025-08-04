@@ -29,6 +29,10 @@ public abstract class Observable {
         observers.add(o);
     }
 
+    public void removeObserver(VentilatorObserver o) {
+        observers.remove(o);
+    }
+
     /**
      * Notifies the observers when a change occurs
      * in the status of this Observable.

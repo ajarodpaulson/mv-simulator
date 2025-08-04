@@ -8,6 +8,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.SwingUtilities;
 
 import com.mvsim.model.exception.ActiveModeNotSetException;
+import com.mvsim.model.exception.PreconditionViolatedException;
 import com.mvsim.model.lungsim.LungSim;
 import com.mvsim.model.lungsim.LungSimSetting;
 import com.mvsim.model.observer.Observable;
@@ -16,6 +17,7 @@ import com.mvsim.model.ventilator.Ventilator;
 import com.mvsim.model.ventilator.VentilatorController;
 import com.mvsim.model.ventilator.metrics.MetricName;
 // import com.mvsim.model.ventilator.metrics.MostRecentTickData;
+import com.mvsim.model.ventilator.settings.Settings;
 
 /**
  * Represents a manager for the lung simulator and mechanical ventilation
@@ -136,7 +138,7 @@ public class SimulationManager extends Observable implements ChangeListener {
     @Override
     public void notifyObservers() {
         SwingUtilities.invokeLater(() -> {
-            updateMetrics();                                        
+            // updateMetrics();                                        
             for (SimMgrObserver o : observers) {
                 o.update(vtrController.getMetrics());
             }

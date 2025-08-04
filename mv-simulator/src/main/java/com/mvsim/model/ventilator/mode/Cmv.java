@@ -15,6 +15,8 @@ import com.mvsim.model.ventilator.settings.Trigger;
  */
 public class Cmv implements BreathSequence {
     Ventilator vtr;
+    private boolean didPhaseTransitionFromInspToExp;
+    private boolean didPhaseTransitionFromExpToInsp;
 
     Cmv(Ventilator vtr) {
         this.vtr = vtr;
@@ -36,16 +38,28 @@ public class Cmv implements BreathSequence {
         float breathCycleDuration = 60f / settings.getSetting(RespiratoryRate.NAME).getValue().intValue();
         float eTime = breathCycleDuration - iTime;
 
+        // false unless we enter one of the conditional answers
+        didPhaseTransitionFromInspToExp = false;
+        didPhaseTransitionFromExpToInsp = false;
+
         if (trigger.hasTriggered(vtr)) {
             activeMode.setIsInInspiratoryPhase(true);
-        } else if (activeMode.getIsInInspiratoryPhase()) {
-            if (activeMode.getTimeInPhaseInMS() / 1000f >= iTime) {
-                activeMode.setIsInInspiratoryPhase(false);
-            }
-        } else {
-            if (activeMode.getTimeInPhaseInMS() / 1000f >= eTime) {
-                activeMode.setIsInInspiratoryPhase(true);
-            }
+        } else if (activeMode.getIsInInspiratoryPhase() && (activeMode.getTimeInPhaseInMS() / 1000f >= iTime)) {
+            activeMode.setIsInInspiratoryPhase(false);
+            didPhaseTransitionFromInspToExp = true;
+        } else if (!activeMode.getIsInInspiratoryPhase() && (activeMode.getTimeInPhaseInMS() / 1000f >= eTime)) {
+            activeMode.setIsInInspiratoryPhase(true);
+            didPhaseTransitionFromExpToInsp = true;
         }
+    }
+
+    @Override
+    public boolean getDidPhaseTransitionFromInspToExp() {
+        return didPhaseTransitionFromInspToExp;
+    }
+
+    @Override
+    public boolean getDidPhaseTransitionFromExpToInsp() {
+        return didPhaseTransitionFromExpToInsp;
     }
 }

@@ -23,10 +23,13 @@ import com.mvsim.model.ventilator.settings.Settings;
 public class VentilatorController {
     private final Ventilator vtr;
     private Metrics metrics;
-    private float systemVolumeChange = 0f;
 
     public VentilatorController(Ventilator vtr) {
         this.vtr = vtr;
+        this.metrics = new Metrics(vtr, this);
+    }
+
+    private void resetMetrics() {
         this.metrics = new Metrics(vtr, this);
     }
 
@@ -76,7 +79,15 @@ public class VentilatorController {
     }
 
     public float getTimeInPreviousBreathCycle() {
-        return vtr.getActiveMode().getTicksInPreviousBreathCycle() * (vtr.getActiveMode().getTickPeriod() / 1000f);
+        return convertNumberOfTicksToSeconds(vtr.getActiveMode().getTicksInPreviousBreathCycle());
+    }
+
+    public float getTimeInPreviousExpPhase() {
+        return convertNumberOfTicksToSeconds(vtr.getActiveMode().getTicksInPreviousExpPhase());
+    }
+
+    private float convertNumberOfTicksToSeconds(int numTicks) {
+        return numTicks * (vtr.getActiveMode().getTickPeriod() / 1000f);
     }
 
     /**
@@ -87,7 +98,6 @@ public class VentilatorController {
      */
     public void enableVentilation() throws ActiveModeNotSetException {
         vtr.enableVentilation();
-        metrics.update();
     }
 
     /**
@@ -98,6 +108,7 @@ public class VentilatorController {
      */
     public void stopVentilation() {
         vtr.disableVentilation();
+        resetMetrics();
     }
 
     /**
@@ -105,7 +116,7 @@ public class VentilatorController {
      */
     public void tick() {
         vtr.tick();
-        metrics.update(); // XXX: appropriate? or should we be using the observer pattern?
+        updateMetrics();
     }
 
     public Set<ModeTAG> getAvailableModes() {
@@ -122,6 +133,14 @@ public class VentilatorController {
 
     public void setActiveModeSetting(String label, float value) throws NoSuchVentilationSettingException {
         vtr.getActiveMode().getSettings().setSetting(label, value);
+    }
+
+    public boolean getDidPhaseTransitionFromExpToInsp() {
+        return vtr.getActiveMode().getDidPhaseTransitionFromExpToInsp();
+    }
+
+    public boolean getDidPhaseTransitionFromInspToExp() {
+        return vtr.getActiveMode().getDidPhaseTransitionFromInspToExp();
     }
 
     public void updateMetrics() {

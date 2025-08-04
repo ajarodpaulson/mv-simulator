@@ -7,4 +7,8 @@ package com.mvsim.model.ventilator.mode;
  */
 public interface BreathSequence {
     public void determinePhase();
+
+    public boolean getDidPhaseTransitionFromExpToInsp();
+
+    public boolean getDidPhaseTransitionFromInspToExp();
 }

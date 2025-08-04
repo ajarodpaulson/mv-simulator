@@ -27,6 +27,7 @@ public class Metrics {
     private float nextPeakPressure;
     private boolean didPhaseTransitionFromExpToInsp = false;
     private float sumPressureTimeIntegrals;
+    private float sumMeasuredPeepTimeIntegrals;
     private float meanPressure;
     private float currentSystemPressure; // TODO: add to map
     private float currentSystemFlowrate; // TODO: add to map
@@ -37,6 +38,22 @@ public class Metrics {
     private VentilatorController controller;
     private boolean isPreviousBreathPhaseInspiratory;
     private boolean didPhaseTransitionFromInspToExp;
+    private float meanPeep;
+    private int totalBreathsDuringCurrentPeriod;
+    private float timeSinceLastUpdateOfExhMV;
+    private float updateWindow = 5.0f;
+    private float nextUpdateTime = updateWindow;
+    private float previousSystemPressure;
+    private float totalExhaledTidalVolumeDuringCurrentPeriod;
+    private float timeSinceLastUpdateOfMeanRespRate;
+
+    // Add separate update windows
+    private float respRateUpdateWindow = 5.0f;
+    private float minuteVolumeUpdateWindow = 5.0f;
+    private float nextRespRateUpdateTime = respRateUpdateWindow;
+    private float nextMinuteVolumeUpdateTime = minuteVolumeUpdateWindow;
+    private float previousBreathInspiredTidalVolume;
+    private float previousBreathExpiredTidalVolume;
 
     public Metrics(Ventilator vtr, VentilatorController controller) {
         this.vtr = vtr;
@@ -65,7 +82,7 @@ public class Metrics {
         updateMeanPressure();
         updateMeanPeep();
         updateMeanRespRate();
-        updateMinuteVolume();
+        updateExhaledMinuteVolume();
         updateMeasuredExhaledTidalVolume();
         updateMeasuredInhaledTidalVolume();
         updateDynamicCompliance();
@@ -94,10 +111,11 @@ public class Metrics {
     public void updatePeakPressure() {
         if (!vtr.getActiveMode().getIsInInspiratoryPhase() && didPhaseTransitionFromInspToExp) {
             setMetricValue(MetricName.PEAK_PRESSURE, nextPeakPressure);
-        } else {
-            nextPeakPressure = Math.max(metricsMap.get(MetricName.PEAK_PRESSURE).getValue(),
-                    vtr.getPressureSensor().getCurrentSystemPressure());
         }
+
+        nextPeakPressure = Math.max(metricsMap.get(MetricName.PEAK_PRESSURE).getValue(),
+                vtr.getPressureSensor().getCurrentSystemPressure());
+
     }
 
     /**
@@ -110,59 +128,148 @@ public class Metrics {
             setMetricValue(MetricName.MEAN_PRESSURE,
                     breathCycleTime != 0 ? sumPressureTimeIntegrals / breathCycleTime : 0);
             sumPressureTimeIntegrals = 0;
+        }
+
+        sumPressureTimeIntegrals += (vtr.getPressureSensor().getCurrentSystemPressure()
+                * (vtr.getActiveMode().getTickPeriod() / 1000f));
+    }
+
+    /**
+     * Updates the mean pressure in the metrics map only when the breath phase
+     * transitions from expiration to inspiration. Does nothing during the
+     * inspiratory phase. During the expiratory phase, keeps a running sum of
+     * pressure-time integrals which are divided by the total time spent in the
+     * expiratory phase when the mean peep gets updated.
+     */
+    // public void updateMeanPeep() {
+    // if (vtr.getActiveMode().getIsInInspiratoryPhase() &&
+    // didPhaseTransitionFromExpToInsp) {
+    // float expPhaseTime = controller.getTimeInPreviousExpPhase();
+    // setMetricValue(MetricName.MEAN_PEEP,
+    // expPhaseTime != 0 ? sumMeasuredPeepTimeIntegrals / expPhaseTime : 0);
+    // sumMeasuredPeepTimeIntegrals = 0;
+    // }
+
+    // if (vtr.getActiveMode().getIsInInspiratoryPhase()) {
+    // return;
+    // } else {
+    // sumMeasuredPeepTimeIntegrals +=
+    // (vtr.getPressureSensor().getCurrentSystemPressure()
+    // * (vtr.getActiveMode().getTickPeriod() / 1000f));
+    // }
+    // }
+
+    public void updateMeanPeep() {
+        if (vtr.getActiveMode().getIsInInspiratoryPhase() && didPhaseTransitionFromExpToInsp) {
+            setMetricValue(MetricName.MEAN_PEEP, previousSystemPressure);
+        }
+    }
+
+    private float updateValuePerCondition(float updateAmount, boolean updateCondition) {
+        if (updateCondition) {
+            return updateAmount;
         } else {
-            sumPressureTimeIntegrals += (vtr.getPressureSensor().getCurrentSystemPressure()
-                    * (vtr.getActiveMode().getTickPeriod() / 1000f));
+            return 0;
         }
     }
 
     /**
-     * @return The pressure value during the expiratory phase only
+     * Updates the mean respiratory rate in the metrics map every 5s. Keeps track of
+     * the respiratory rate for the previous 5s.
+     * 
+     * TODO: there's a problem with this method. Test isn't passing
      */
-    public float updateMeanPeep() {
-        return 0;
+    public void updateMeanRespRate() {
+        if (didPhaseTransitionFromExpToInsp) {
+            totalBreathsDuringCurrentPeriod++;
+        }
+
+        if (hasRespRateUpdateWindowElapsed(controller.getVentilationTimeForActiveMode())) {
+            setMetricValue(MetricName.MEAN_RESP_RATE,
+                    timeSinceLastUpdateOfMeanRespRate != 0
+                            ? calculateAvgPerMin(totalBreathsDuringCurrentPeriod, timeSinceLastUpdateOfMeanRespRate)
+                            : 0);
+            totalBreathsDuringCurrentPeriod = 0;
+            timeSinceLastUpdateOfMeanRespRate = 0;
+        } else {
+            timeSinceLastUpdateOfMeanRespRate += (controller.getTickPeriodInMs() / 1000f);
+        }
+    }
+
+    public void updateExhaledMinuteVolume() {
+        if (!controller.getActiveMode().getIsInInspiratoryPhase()) {
+            totalExhaledTidalVolumeDuringCurrentPeriod += currentSystemVolumeChange;
+        }
+        if (hasMinuteVolumeUpdateWindowElapsed(controller.getVentilationTimeForActiveMode())) {
+            setMetricValue(MetricName.EXHALED_MINUTE_VOLUME,
+                    timeSinceLastUpdateOfExhMV != 0
+                            ? calculateAvgPerMin(totalExhaledTidalVolumeDuringCurrentPeriod / 1000f, timeSinceLastUpdateOfExhMV)
+                            : 0);
+            totalExhaledTidalVolumeDuringCurrentPeriod = 0;
+            timeSinceLastUpdateOfExhMV = 0;
+        } else {
+            timeSinceLastUpdateOfExhMV += (controller.getTickPeriodInMs() / 1000f);
+        }
+    }
+
+    private float calculateAvgPerMin(float quantity, float timeSinceLastUpdate) {
+        return (quantity / timeSinceLastUpdate) * 60;
+    }
+
+    // Create separate methods for checking update windows
+    private boolean hasRespRateUpdateWindowElapsed(float ventilationTime) {
+        if (ventilationTime >= nextRespRateUpdateTime) {
+            nextRespRateUpdateTime += respRateUpdateWindow;
+            return true;
+        }
+        return false;
+    }
+
+    private boolean hasMinuteVolumeUpdateWindowElapsed(float ventilationTime) {
+        if (ventilationTime >= nextMinuteVolumeUpdateTime) {
+            nextMinuteVolumeUpdateTime += minuteVolumeUpdateWindow;
+            return true;
+        }
+        return false;
     }
 
     /**
      * 
-     * @return The number of breaths delivered over the last 5s * 12
+     * Updates the inhaled tidal volume from the most recent inspiratory phase
      */
-    public float updateMeanRespRate() {
-        return 0;
+    public void updateMeasuredInhaledTidalVolume() {
+        if (!didPhaseTransitionFromInspToExp) {
+            return;
+        } else {
+            setMetricValue(MetricName.MEASURED_INHALED_TIDAL_VOLUME, previousBreathInspiredTidalVolume);
+        }
     }
 
     /**
      * 
-     * @return The number of breaths delivered over the last 10s * the average tidal
-     *         volume over the last 10s
+     * Updates the exhaled tidal volume from the most recent inspiratory phase
      */
-    public float updateMinuteVolume() {
-        return 0;
+    public void updateMeasuredExhaledTidalVolume() {
+        if (!didPhaseTransitionFromExpToInsp) {
+            return;
+        } else {
+            setMetricValue(MetricName.MEASURED_EXHALED_TIDAL_VOLUME, previousBreathExpiredTidalVolume);
+        }
     }
 
     /**
      * 
-     * @return the inhaled tidal volume from the most recent inspiratory phase
+     * Updates the measured inspired tidal volume from the last breath divided by
+     * the peak inspiratory pressure minus the PEEP
      */
-    public float updateMeasuredInhaledTidalVolume() {
-        return 0;
-    }
-
-    /**
-     * 
-     * @return the inhaled tidal volume from the most recent inspiratory phase
-     */
-    public float updateMeasuredExhaledTidalVolume() {
-        return 0;
-    }
-
-    /**
-     * 
-     * @return the measured exhaled tidal volume from the last breath divided by the
-     *         peak inspiratory pressure minus the PEEP
-     */
-    public float updateDynamicCompliance() {
-        return 0;
+    public void updateDynamicCompliance() {
+        if (!didPhaseTransitionFromInspToExp) {
+            return;
+        } else {
+            float inspPressureChange = getMetric(MetricName.PEAK_PRESSURE).getValue() - getMetric(MetricName.MEAN_PEEP).getValue();
+            setMetricValue(MetricName.DYNAMIC_COMPLIANCE,
+                    inspPressureChange != 0 ? previousBreathInspiredTidalVolume / inspPressureChange : 0);
+        }
     }
 
     public float getCurrentSystemFlowrate() {
@@ -175,6 +282,13 @@ public class Metrics {
 
     public void updateCurrentSystemVolumeChange() {
         float cf = 1000f / 60f;
+        if (didPhaseTransitionFromInspToExp) {
+            previousBreathInspiredTidalVolume = currentSystemVolumeChange;
+        }
+
+        if (didPhaseTransitionFromExpToInsp) {
+            previousBreathExpiredTidalVolume = previousBreathInspiredTidalVolume - currentSystemVolumeChange;
+        }
         if (vtr.getActiveMode().getIsInInspiratoryPhase()) {
             currentSystemVolumeChange += (vtr.getInspFlowSensor().getLatestInspiratoryFlowReading() * cf)
                     * (VentilationMode.TICK_PERIOD_IN_MS / 1000f);
@@ -188,24 +302,21 @@ public class Metrics {
         return currentSystemVolumeChange;
     }
 
+    /**
+     * This method is responsible for updating all of the metrics up to and
+     * including the tick period that just occurred.
+     */
     public void update() {
+        didPhaseTransitionFromExpToInsp = controller.getDidPhaseTransitionFromExpToInsp();
+        didPhaseTransitionFromInspToExp = controller.getDidPhaseTransitionFromInspToExp();
+        previousSystemPressure = this.currentSystemPressure;
         this.currentSystemPressure = vtr.getPressureSensor().getCurrentSystemPressure();
         this.currentSystemFlowrate = getCurrentSystemFlowrate();
         updateCurrentSystemVolumeChange();
         this.currentSystemTime = controller.getVentilationTimeForActiveMode();
 
         boolean isCurrentBreathPhaseInspiratory = vtr.getActiveMode().getIsInInspiratoryPhase();
-        if (isPreviousBreathPhaseInspiratory && !isCurrentBreathPhaseInspiratory) {
-            didPhaseTransitionFromInspToExp = true;
-        } else {
-            didPhaseTransitionFromInspToExp = false;
-        }
 
-        if (!isPreviousBreathPhaseInspiratory && isCurrentBreathPhaseInspiratory) {
-            didPhaseTransitionFromExpToInsp = true;
-        } else {
-            didPhaseTransitionFromExpToInsp = false;
-        }
         updateMetricsMap();
         isPreviousBreathPhaseInspiratory = isCurrentBreathPhaseInspiratory;
     }

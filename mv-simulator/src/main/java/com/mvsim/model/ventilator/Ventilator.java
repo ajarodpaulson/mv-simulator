@@ -62,6 +62,21 @@ public class Ventilator extends Observable {
         this.addObserver(expFlowSensor);
     }
 
+    private void resetSensors() {
+        this.removeObserver(pressureSensor);
+        this.removeObserver(inspFlowSensor);
+        this.removeObserver(expFlowSensor);
+
+        this.inspFlowSensor = new InspFlowSensor();
+        this.expFlowSensor = new ExpFlowSensor();
+        this.pressureSensor = new PressureSensor();
+        this.actuator = new Actuator(this);
+
+        this.addObserver(pressureSensor);
+        this.addObserver(inspFlowSensor);
+        this.addObserver(expFlowSensor);
+    }
+
     public VentilatorController getController() {
         return controller;
     }
